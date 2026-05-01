@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thota Family Tree · థోటా వంశ వృక్షం</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+Telugu:wght@300;400;500;600&family=Noto+Serif:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --saffron:#FF9933;--saffron-lt:#FFB566;--saffron-dk:#CC6600;
+  --gold:#D4AF37;--gold-lt:#F0D060;--gold-dk:#A07820;
+  --maroon:#800020;--maroon-lt:#A0304A;--maroon-dk:#500010;
+  --cream:#FDF6E3;--cream-dk:#F5E8C0;
+  --ink:#1A0800;
+  --node-bg:rgba(253,246,227,0.97);
+  --node-border:#C8921A;
+  --shadow-warm:rgba(180,100,0,0.18);
+  --glow-you:rgba(255,153,51,0.6);
+}
+html,body{width:100%;min-height:100vh;background:var(--ink);color:var(--ink);font-family:'Crimson Pro',Georgia,serif;overflow-x:hidden}
+
+/* ── TELUGU FONT BODY CLASS ── */
+body.lang-te{font-family:'Noto Serif Telugu',serif}
+body.lang-te .header h1{font-family:'Noto Serif Telugu',serif;letter-spacing:0.02em}
+body.lang-te .btn{font-family:'Noto Serif Telugu',serif;letter-spacing:0.01em}
+body.lang-te .node-name{font-family:'Noto Serif Telugu',serif;font-size:0.7rem}
+body.lang-te .node-rel{font-family:'Noto Serif Telugu',serif;font-size:0.6rem}
+body.lang-te .modal h2{font-family:'Noto Serif Telugu',serif}
+body.lang-te .fgrp label{font-family:'Noto Serif Telugu',serif;letter-spacing:0.01em}
+body.lang-te .modal p{font-family:'Noto Serif Telugu',serif}
+body.lang-te .header-sub{font-family:'Noto Serif Telugu',serif;letter-spacing:0.05em}
+body.lang-te .you-bar{font-family:'Noto Serif Telugu',serif}
+body.lang-te .zoom-label{font-family:'Noto Serif Telugu',serif}
+body.lang-te .leg-item{font-family:'Noto Serif Telugu',serif}
+body.lang-te .hint-bar{font-family:'Noto Serif Telugu',serif;letter-spacing:0.02em}
+
+/* ── LANG TOGGLE BUTTON ── */
+.lang-toggle{
+  display:inline-flex;align-items:center;gap:0;
+  border-radius:20px;overflow:hidden;
+  border:1px solid rgba(212,175,55,0.5);
+  background:rgba(26,8,0,0.8);
+}
+.lang-opt{
+  padding:0.38rem 0.85rem;
+  font-size:0.7rem;cursor:pointer;
+  transition:all .2s;color:rgba(240,208,96,0.6);
+  font-family:'Cinzel',serif;letter-spacing:0.08em;
+  border:none;background:transparent;
+}
+.lang-opt.active{
+  background:linear-gradient(135deg,var(--maroon),var(--maroon-lt));
+  color:var(--cream);font-weight:600;
+}
+.lang-opt:first-child{border-right:1px solid rgba(212,175,55,0.25)}
+
+/* BG */
+.bg-layer{position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(212,175,55,0.18) 0%,transparent 60%),
+  radial-gradient(ellipse at 0% 100%,rgba(128,0,32,0.2) 0%,transparent 50%),
+  radial-gradient(ellipse at 100% 100%,rgba(255,153,51,0.12) 0%,transparent 50%),#1A0800;overflow:hidden}
+.bg-layer::before{content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(0deg,rgba(212,175,55,0.04) 0px,transparent 1px,transparent 40px,rgba(212,175,55,0.04) 41px),
+  repeating-linear-gradient(90deg,rgba(212,175,55,0.04) 0px,transparent 1px,transparent 40px,rgba(212,175,55,0.04) 41px)}
+.bg-layer::after{content:'';position:absolute;width:900px;height:900px;top:50%;left:50%;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 50% 50%,transparent 38%,rgba(212,175,55,0.06) 39%,transparent 40%,transparent 44%,rgba(212,175,55,0.05) 45%,transparent 46%,transparent 49%,rgba(212,175,55,0.04) 50%,transparent 51%);
+  animation:mandala-spin 80s linear infinite}
+@keyframes mandala-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+/* CORNERS */
+.corner-decor{position:fixed;width:120px;height:120px;opacity:0.18;z-index:1;pointer-events:none}
+.corner-decor.tl{top:0;left:0}.corner-decor.tr{top:0;right:0;transform:scaleX(-1)}
+.corner-decor.bl{bottom:60px;left:0;transform:scaleY(-1)}.corner-decor.br{bottom:60px;right:0;transform:scale(-1,-1)}
+
+/* HEADER */
+.header{position:relative;z-index:10;text-align:center;padding:1.5rem 1rem 0.8rem;border-bottom:1px solid rgba(212,175,55,0.25)}
+.header-ornament{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:0.3rem;color:var(--gold)}
+.ornament-line{height:1px;width:60px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.header h1{font-family:'Cinzel',serif;font-size:clamp(1.4rem,4vw,2.5rem);font-weight:700;color:var(--gold-lt);letter-spacing:0.08em;text-shadow:0 2px 20px rgba(212,175,55,0.4);transition:font-family 0.3s}
+.header-sub{font-family:'Noto Serif',serif;font-size:0.78rem;color:var(--saffron-lt);letter-spacing:0.2em;text-transform:uppercase;margin-top:0.25rem;opacity:0.85;transition:all 0.3s}
+
+/* TOOLBAR */
+.toolbar{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;gap:0.5rem;flex-wrap:wrap;padding:0.6rem 1rem;border-bottom:1px solid rgba(212,175,55,0.15)}
+.btn{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.1em;padding:0.4rem 1rem;border-radius:4px;border:1px solid rgba(212,175,55,0.4);background:rgba(26,8,0,0.7);color:var(--gold-lt);cursor:pointer;transition:all .22s;backdrop-filter:blur(4px)}
+.btn:hover{background:rgba(212,175,55,0.15);border-color:var(--gold);box-shadow:0 0 12px rgba(212,175,55,0.25)}
+.btn-primary{background:linear-gradient(135deg,var(--maroon) 0%,var(--maroon-lt) 100%);border-color:var(--saffron);color:var(--cream)}
+.btn-primary:hover{background:linear-gradient(135deg,var(--maroon-lt) 0%,var(--saffron-dk) 100%);box-shadow:0 0 18px rgba(255,153,51,0.35)}
+.btn-danger{background:rgba(128,0,32,0.3);border-color:rgba(255,100,80,0.4);color:#ffaaaa}
+.you-bar{position:relative;z-index:10;text-align:center;padding:0.32rem 1rem;background:rgba(255,153,51,0.1);border-bottom:1px solid rgba(255,153,51,0.2);font-size:0.75rem;color:var(--saffron-lt);letter-spacing:0.04em;display:none}
+.you-bar b{color:var(--gold-lt)}
+.hint-bar{position:relative;z-index:10;text-align:center;padding:0.22rem;font-size:0.66rem;color:rgba(212,175,55,0.35);letter-spacing:0.06em}
+
+/* TREE VIEWPORT */
+.tree-viewport{position:relative;z-index:5;overflow:hidden;flex:1;cursor:grab;height:calc(100vh - 220px);min-height:400px}
+.tree-viewport.panning{cursor:grabbing}
+.tree-canvas{position:absolute;transform-origin:0 0;padding:3rem 4rem 4rem;display:inline-flex;flex-direction:column;align-items:center;will-change:transform}
+
+/* NODES */
+.p-col{display:flex;flex-direction:column;align-items:center}
+.couple-wrap{display:flex;align-items:center}
+.sp-line{width:20px;height:2px;background:linear-gradient(90deg,var(--gold-dk),var(--saffron-dk));flex-shrink:0;position:relative}
+.sp-line::after{content:'✦';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:6px;color:var(--gold)}
+.node-box{min-width:86px;max-width:122px;padding:0.38rem 0.65rem 0.32rem;border-radius:8px;background:var(--node-bg);border:1.5px solid var(--node-border);
+  box-shadow:0 2px 8px var(--shadow-warm),inset 0 1px 0 rgba(255,255,255,0.8);cursor:pointer;text-align:center;position:relative;
+  transition:transform .18s,box-shadow .18s,border-color .18s;animation:node-appear 0.4s ease both}
+@keyframes node-appear{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.node-box::before{content:'';position:absolute;inset:-1px;border-radius:9px;
+  background:linear-gradient(135deg,rgba(212,175,55,0.3) 0%,transparent 50%,rgba(255,153,51,0.15) 100%);pointer-events:none}
+.node-box:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 6px 20px rgba(180,100,0,0.3),inset 0 1px 0 rgba(255,255,255,0.9);border-color:var(--saffron);z-index:10}
+.node-box.is-you{background:linear-gradient(160deg,#FFF8E0 0%,#FFE8A0 100%);border-color:var(--saffron);
+  box-shadow:0 0 0 3px rgba(255,153,51,0.25),0 0 22px var(--glow-you),0 4px 14px rgba(200,100,0,0.35),inset 0 1px 0 rgba(255,255,255,0.9);
+  animation:you-pulse 2.5s ease-in-out infinite,node-appear 0.4s ease both}
+@keyframes you-pulse{
+  0%,100%{box-shadow:0 0 0 3px rgba(255,153,51,0.25),0 0 20px rgba(255,153,51,0.5),0 4px 14px rgba(200,100,0,0.35)}
+  50%{box-shadow:0 0 0 6px rgba(255,153,51,0.12),0 0 36px rgba(255,153,51,0.75),0 4px 18px rgba(200,100,0,0.4)}}
+.node-name{font-family:'Crimson Pro',serif;font-weight:500;font-size:0.74rem;color:var(--ink);line-height:1.25;display:block;transition:font-family 0.3s}
+.node-name.you-nm{color:var(--maroon);font-weight:600}
+.node-rel{display:block;font-family:'Cinzel',serif;font-size:0.54rem;letter-spacing:0.06em;color:var(--maroon-lt);margin-top:2px;line-height:1.3;transition:font-family 0.3s}
+.node-rel.rel-you{color:var(--maroon-dk);font-weight:600;background:rgba(255,153,51,0.2);border-radius:3px;padding:1px 4px}
+
+/* CONNECTORS */
+.v-conn{width:1.5px;background:linear-gradient(180deg,var(--gold-dk),rgba(180,120,0,0.3));flex-shrink:0}
+.tog{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle,var(--cream) 60%,var(--cream-dk) 100%);border:1px solid var(--gold-dk);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:8px;color:var(--maroon);font-weight:700;flex-shrink:0;margin:1px 0;transition:all .18s;box-shadow:0 1px 4px rgba(180,100,0,0.25);font-family:monospace;line-height:1;user-select:none}
+.tog:hover{background:radial-gradient(circle,var(--saffron-lt) 60%,var(--saffron) 100%);border-color:var(--saffron);box-shadow:0 0 8px rgba(255,153,51,0.4)}
+.ch-area{display:flex;flex-direction:column;align-items:center}
+.ch-row{display:flex;align-items:flex-start;position:relative}
+.ch-col{display:flex;flex-direction:column;align-items:center;padding:0 5px;animation:slide-in 0.28s ease both}
+@keyframes slide-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:999;background:rgba(10,2,0,0.82);display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
+.modal{background:linear-gradient(160deg,#2C1200 0%,#1A0800 100%);border:1px solid rgba(212,175,55,0.4);border-radius:12px;padding:2rem;width:100%;max-width:420px;box-shadow:0 0 0 1px rgba(255,153,51,0.1),0 24px 60px rgba(0,0,0,0.6);position:relative;overflow:hidden}
+.modal::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 0% 0%,rgba(212,175,55,0.08) 0%,transparent 60%),radial-gradient(circle at 100% 100%,rgba(255,153,51,0.06) 0%,transparent 50%);pointer-events:none}
+.modal h2{font-family:'Cinzel',serif;font-size:1.2rem;color:var(--gold-lt);margin-bottom:0.4rem;letter-spacing:0.05em}
+.modal p{font-size:0.8rem;color:rgba(255,220,150,0.65);margin-bottom:1.3rem;line-height:1.6}
+.fgrp{margin-bottom:0.9rem}
+.fgrp label{display:block;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.12em;color:var(--saffron-lt);margin-bottom:0.3rem;text-transform:uppercase}
+.fgrp input,.fgrp select{width:100%;padding:0.5rem 0.8rem;background:rgba(0,0,0,0.4);border:1px solid rgba(212,175,55,0.35);border-radius:6px;color:var(--cream);font-family:'Crimson Pro',serif;font-size:0.88rem;outline:none;transition:border-color .18s,box-shadow .18s}
+.fgrp input:focus,.fgrp select:focus{border-color:var(--saffron);box-shadow:0 0 10px rgba(255,153,51,0.2)}
+.fgrp select option{background:#2C1200}
+.modal-err{font-size:0.74rem;color:#ffaaaa;margin-top:0.4rem;min-height:1.1em}
+.modal-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.3),transparent);margin:1rem 0}
+.modal-footer{display:flex;gap:0.7rem;justify-content:flex-end;margin-top:1.2rem}
+
+/* TIMELINE */
+.timeline-wrap{position:fixed;bottom:0;left:0;right:0;z-index:50;height:40px;
+  background:linear-gradient(90deg,var(--maroon-dk) 0%,#3D0010 30%,#3D0010 70%,var(--maroon-dk) 100%);
+  border-top:1px solid rgba(212,175,55,0.35);overflow:hidden;display:flex;align-items:center}
+.timeline-wrap::before,.timeline-wrap::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2}
+.timeline-wrap::before{left:0;background:linear-gradient(90deg,#200008,transparent)}
+.timeline-wrap::after{right:0;background:linear-gradient(270deg,#200008,transparent)}
+.timeline-track{display:flex;align-items:center;white-space:nowrap;animation:scroll-rtl 32s linear infinite;will-change:transform}
+.timeline-track:hover{animation-play-state:paused}
+@keyframes scroll-rtl{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.timeline-seg{display:inline-flex;align-items:center;gap:16px;padding:0 36px}
+.timeline-gem{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px rgba(212,175,55,0.6);flex-shrink:0}
+.timeline-text{font-family:'Crimson Pro',serif;font-size:0.8rem;font-style:italic;color:rgba(253,240,180,0.85);letter-spacing:0.04em}
+.timeline-text b{font-style:normal;font-weight:600;color:var(--gold-lt)}
+body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif;font-style:normal;font-size:0.78rem}
+
+/* ZOOM */
+.zoom-indicator{position:fixed;bottom:50px;right:10px;z-index:40;display:flex;flex-direction:column;gap:4px;align-items:center}
+.zoom-btn{width:26px;height:26px;border-radius:50%;background:rgba(40,15,0,0.85);border:1px solid rgba(212,175,55,0.35);color:var(--gold-lt);font-size:1rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;backdrop-filter:blur(4px);font-family:monospace}
+.zoom-btn:hover{background:rgba(212,175,55,0.2);border-color:var(--gold);box-shadow:0 0 10px rgba(212,175,55,0.3)}
+.zoom-label{font-family:'Cinzel',serif;font-size:0.56rem;color:rgba(212,175,55,0.55);letter-spacing:0.08em}
+
+/* LEGEND */
+.legend{position:fixed;bottom:50px;left:10px;z-index:40;display:flex;flex-direction:column;gap:5px;background:rgba(20,5,0,0.78);border:1px solid rgba(212,175,55,0.2);border-radius:8px;padding:0.45rem 0.75rem;backdrop-filter:blur(4px)}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:0.62rem;color:rgba(253,240,180,0.6);font-family:'Noto Serif',serif}
+.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- Corner decorations -->
+<svg class="corner-decor tl" viewBox="0 0 120 120" fill="none"><path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/><path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/><circle cx="15" cy="15" r="6" stroke="#D4AF37" stroke-width="1" fill="none"/><circle cx="15" cy="15" r="3" fill="#D4AF37" fill-opacity="0.4"/><path d="M15 5 L17 9 L22 9 L18 12 L20 17 L15 14 L10 17 L12 12 L8 9 L13 9 Z" fill="#D4AF37" fill-opacity="0.5"/></svg>
+<svg class="corner-decor tr" viewBox="0 0 120 120" fill="none"><path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/><path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/><circle cx="15" cy="15" r="6" stroke="#D4AF37" stroke-width="1" fill="none"/><circle cx="15" cy="15" r="3" fill="#D4AF37" fill-opacity="0.4"/></svg>
+<svg class="corner-decor bl" viewBox="0 0 120 120" fill="none"><path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/><path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/></svg>
+<svg class="corner-decor br" viewBox="0 0 120 120" fill="none"><path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/><path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/></svg>
+
+<div class="bg-layer"></div>
+
+<div style="position:relative;z-index:5;display:flex;flex-direction:column;min-height:100vh">
+
+  <header class="header">
+    <div class="header-ornament">
+      <div class="ornament-line"></div>
+      <span style="font-size:1rem;color:var(--saffron)">✦</span>
+      <div class="ornament-line"></div>
+    </div>
+    <h1 id="main-title">Thota Family Tree</h1>
+    <div class="header-sub" id="main-sub">Thota Vamsham &nbsp;·&nbsp; Six Generations · All Branches</div>
+  </header>
+
+  <div class="toolbar" id="toolbar"></div>
+  <div class="you-bar" id="you-bar"></div>
+  <div class="hint-bar" id="hint-bar">Drag to pan &nbsp;·&nbsp; Scroll / pinch to zoom &nbsp;·&nbsp; +/− to expand / collapse</div>
+
+  <div class="tree-viewport" id="tree-viewport">
+    <div class="tree-canvas" id="tree-canvas"></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:var(--saffron);box-shadow:0 0 5px rgba(255,153,51,.6)"></div><span id="leg1">You (glowing)</span></div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div><span id="leg2">Relationship via BFS+LCA</span></div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--node-border)"></div><span id="leg3">Family node</span></div>
+  </div>
+
+  <div class="zoom-indicator">
+    <button class="zoom-btn" id="zoom-in">+</button>
+    <div class="zoom-label" id="zoom-label">85%</div>
+    <button class="zoom-btn" id="zoom-out">−</button>
+    <button class="zoom-btn" id="zoom-reset" style="font-size:.6rem">FIT</button>
+  </div>
+
+  <div id="modal-root"></div>
+
+  <div class="timeline-wrap">
+    <div class="timeline-track" id="timeline-track"></div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   LANGUAGE SYSTEM
+   All UI strings and all relationship labels in EN + TE
+============================================================ */
+let lang = 'en'; // 'en' or 'te'
+
+const T = {
+  en: {
+    title:          'Thota Family Tree',
+    sub:            'Thota Vamsham · Six Generations · All Branches',
+    btnRelation:    '✦ Know Your Relationship',
+    btnExpand:      'Expand All',
+    btnCollapse:    'Collapse All',
+    btnClear:       '✕ Clear',
+    btnLangEn:      'EN',
+    btnLangTe:      'తె',
+    hint:           'Drag to pan · Scroll / pinch to zoom · +/− to expand / collapse',
+    youBarPrefix:   'Showing relationships relative to:',
+    youBarSuffix:   '· Computed via BFS + Lowest Common Ancestor',
+    leg1:           'You (glowing)',
+    leg2:           'Relationship via BFS+LCA',
+    leg3:           'Family node',
+    modalTitle:     'Know Your Relationship',
+    modalDesc:      'Type your name as it appears in the tree. If the same name appears in multiple branches, also choose your father to pinpoint you exactly.',
+    labelName:      'Your Name',
+    placeholderName:'e.g. Kumar, Srinu, Veeraiah, Venkatesh…',
+    labelFather:    'Your Father',
+    labelFatherHint:'(optional — resolves duplicates)',
+    fatherDefault:  '— Select your father —',
+    btnCancel:      'Cancel',
+    btnFind:        'Find Me in Tree ✦',
+    errNoName:      'Please enter your name.',
+    errNotFound:    'Name not found. Check spelling or pick your father above.',
+    errMultiple:    'Multiple matches found. Please select your father to narrow it down.',
+    timeline:       'Thota Family Tree structure created by <b>Venkatesh Thota</b>, S/o <b>Sambaiah Thota</b> &nbsp;✦&nbsp; Thota Vamsham · Six Generations · All Branches Complete',
+    // Relationships
+    You:            'You',
+    Spouse:         'Spouse',
+    Father:         'Father',
+    Mother:         'Mother',
+    Son:            'Son',
+    Daughter:       'Daughter',
+    Grandson:       'Grandson',
+    Granddaughter:  'Granddaughter',
+    Grandfather:    'Grandfather',
+    Grandmother:    'Grandmother',
+    Brother:        'Brother',
+    Sister:         'Sister',
+    Uncle:          'Uncle',
+    Aunt:           'Aunt',
+    Nephew:         'Nephew',
+    Niece:          'Niece',
+    GrandUncle:     'Grand-Uncle',
+    GrandAunt:      'Grand-Aunt',
+    GrandNephew:    'Grand-Nephew',
+    GrandNiece:     'Grand-Niece',
+    Cousin:         'Cousin',
+    FatherInLaw:    'Father-in-law',
+    MotherInLaw:    'Mother-in-law',
+    SonInLaw:       'Son-in-law',
+    DaughterInLaw:  'Daughter-in-law',
+    BrotherInLaw:   'Brother-in-law',
+    SisterInLaw:    'Sister-in-law',
+    UncleMarriage:  'Uncle (by marriage)',
+    AuntMarriage:   'Aunt (by marriage)',
+    CousinSpouse:   "Cousin's Spouse",
+    GranddaughterInLaw: 'Granddaughter-in-law',
+    GrandsonInLaw:  'Grandson-in-law',
+  },
+  te: {
+    title:          'థోటా వంశ వృక్షం',
+    sub:            'థోటా వంశం · ఆరు తరాలు · అన్ని శాఖలు',
+    btnRelation:    '✦ మీ బంధం తెలుసుకోండి',
+    btnExpand:      'అన్నీ విప్పండి',
+    btnCollapse:    'అన్నీ మూయండి',
+    btnClear:       '✕ తీసివేయి',
+    btnLangEn:      'EN',
+    btnLangTe:      'తె',
+    hint:           'లాగడానికి డ్రాగ్ చేయండి · జూమ్ చేయడానికి స్క్రోల్ చేయండి · +/− శాఖలు తెరవండి/మూయండి',
+    youBarPrefix:   'బంధాలు చూపుతున్నారు:',
+    youBarSuffix:   '· BFS + LCA ద్వారా లెక్కించారు',
+    leg1:           'మీరు (మెరుపు)',
+    leg2:           'BFS+LCA ద్వారా బంధం',
+    leg3:           'కుటుంబ సభ్యుడు',
+    modalTitle:     'మీ బంధం తెలుసుకోండి',
+    modalDesc:      'చెట్టులో కనిపించే విధంగా మీ పేరు టైప్ చేయండి. ఒకే పేరు అనేక చోట్ల ఉంటే, మీ నాన్న పేరు కూడా ఎంచుకోండి.',
+    labelName:      'మీ పేరు',
+    placeholderName:'ఉదా: కుమార్, శ్రీను, వీరయ్య…',
+    labelFather:    'మీ తండ్రి',
+    labelFatherHint:'(ఐచ్ఛికం — నకళ్ళు తగ్గిస్తుంది)',
+    fatherDefault:  '— మీ తండ్రిని ఎంచుకోండి —',
+    btnCancel:      'రద్దు చేయి',
+    btnFind:        'చెట్టులో నన్ను కనుగొనండి ✦',
+    errNoName:      'దయచేసి మీ పేరు నమోదు చేయండి.',
+    errNotFound:    'పేరు కనుగొనబడలేదు. స్పెల్లింగ్ తనిఖీ చేయండి.',
+    errMultiple:    'అనేక మ్యాచ్‌లు కనుగొనబడ్డాయి. మీ తండ్రిని ఎంచుకోండి.',
+    timeline:       'థోటా వంశ వృక్షం నిర్మించారు <b>వెంకటేశ్ థోటా</b>, తండ్రి <b>సంబయ్య థోటా</b> &nbsp;✦&nbsp; థోటా వంశం · ఆరు తరాలు · పూర్తి వంశ వృక్షం',
+    // Relationships — Telugu family terms
+    You:            'మీరు',
+    Spouse:         'భార్య/భర్త',
+    Father:         'నాన్న',
+    Mother:         'అమ్మ',
+    Son:            'కొడుకు',
+    Daughter:       'కూతురు',
+    Grandson:       'మనవడు',
+    Granddaughter:  'మనవరాలు',
+    Grandfather:    'తాత',
+    Grandmother:    'నానమ్మ',
+    Brother:        'అన్న/తమ్ముడు',
+    Sister:         'అక్క/చెల్లెలు',
+    Uncle:          'మామయ్య/పెదనాన్న',
+    Aunt:           'అత్తయ్య/పెద్దమ్మ',
+    Nephew:         'మేనల్లుడు',
+    Niece:          'మేనకోడలు',
+    GrandUncle:     'పెద్ద మామయ్య',
+    GrandAunt:      'పెద్ద అత్తయ్య',
+    GrandNephew:    'మనవ అల్లుడు',
+    GrandNiece:     'మనవ కోడలు',
+    Cousin:         'బావ/మరది/అత్తకొడుకు',
+    FatherInLaw:    'మావగారు',
+    MotherInLaw:    'అత్తగారు',
+    SonInLaw:       'అల్లుడు',
+    DaughterInLaw:  'కోడలు',
+    BrotherInLaw:   'బావమరిది',
+    SisterInLaw:    'వదిన/మరదలు',
+    UncleMarriage:  'మామయ్య (వివాహం ద్వారా)',
+    AuntMarriage:   'అత్తయ్య (వివాహం ద్వారా)',
+    CousinSpouse:   'మేనల్లుడి భార్య/భర్త',
+    GranddaughterInLaw: 'మనవ కోడలు',
+    GrandsonInLaw:  'మనవ అల్లుడు',
+  }
+};
+
+function t(key){ return T[lang][key] || T.en[key] || key; }
+
+function setLang(l){
+  lang = l;
+  document.body.classList.toggle('lang-te', l==='te');
+  applyUIStrings();
+  if(youId) relMap = buildRelMap(youId);
+  renderToolbar();
+  renderYouBar();
+  renderTree();
+  buildTimeline();
+}
+
+function applyUIStrings(){
+  const el = id => document.getElementById(id);
+  if(el('main-title')) el('main-title').textContent = t('title');
+  if(el('main-sub'))   el('main-sub').textContent   = t('sub');
+  if(el('hint-bar'))   el('hint-bar').textContent   = t('hint');
+  if(el('leg1'))       el('leg1').textContent        = t('leg1');
+  if(el('leg2'))       el('leg2').textContent        = t('leg2');
+  if(el('leg3'))       el('leg3').textContent        = t('leg3');
+}
+
+/* ============================================================
+   FAMILY DATA
+============================================================ */
+let _uid = 1;
+const G = {};
+function mkId(){ return 'N'+(++_uid); }
+function person(name, gender){
+  const id = mkId();
+  G[id] = { id, name, gender: gender||'m', fatherId:null, motherId:null, spouseId:null, childrenIds:[] };
+  return id;
+}
+function marry(aId, bId){
+  if(!aId||!bId) return;
+  G[aId].spouseId = bId; G[bId].spouseId = aId;
+}
+function addChildren(parentId, spouseId, childIds){
+  if(parentId && G[parentId]) G[parentId].childrenIds = childIds;
+  childIds.forEach(cId => {
+    if(!G[cId]) return;
+    const pg = G[parentId];
+    if(pg){
+      if(pg.gender==='m'){ G[cId].fatherId=parentId; if(spouseId) G[cId].motherId=spouseId; }
+      else               { G[cId].motherId=parentId; if(spouseId) G[cId].fatherId=spouseId; }
+    }
+  });
+}
+
+/* ROOT */
+const P_Veraiah      = person('Veraiah','m');
+const P_Laxminasamma = person('Laxminasamma','f');
+marry(P_Veraiah, P_Laxminasamma);
+
+/* ── KANAKAIAH ── */
+const P_Kanakaiah = person('Kanakaiah','m');
+const P_Laxmi_K   = person('Laxmi','f');
+marry(P_Kanakaiah, P_Laxmi_K);
+
+  const P_Veeraiah = person('Veeraiah','m');
+  const P_Mallamma = person('Mallamma','f');
+  marry(P_Veeraiah, P_Mallamma);
+
+    const P_Kumar   = person('Kumar','m');
+    const P_Swarupa = person('Swarupa','f');
+    marry(P_Kumar, P_Swarupa);
+      const P_Pravalika     = person('Pravalika','f');
+      const P_Chandrashekar = person('Chandrashekar','m');
+      marry(P_Pravalika, P_Chandrashekar);
+        const P_Vikramaditya = person('Vikramaditya','m');
+        const P_Dhruva       = person('Dhruva','m');
+        addChildren(P_Pravalika, P_Chandrashekar, [P_Vikramaditya, P_Dhruva]);
+      const P_Pranay = person('Pranay','m');
+    addChildren(P_Kumar, P_Swarupa, [P_Pravalika, P_Pranay]);
+
+    const P_Srinu_V  = person('Srinu','m');
+    const P_Radhika  = person('Radhika','f');
+    marry(P_Srinu_V, P_Radhika);
+      const P_Vickey   = person('Vickey','m');
+      const P_Pranatha = person('Pranatha','f');
+      const P_Rajiv    = person('Rajiv','m');
+      marry(P_Pranatha, P_Rajiv);
+      const P_Nikitha  = person('Nikitha','f');
+      const P_Rakesh_N = person('Rakesh','m');
+      marry(P_Nikitha, P_Rakesh_N);
+    addChildren(P_Srinu_V, P_Radhika, [P_Vickey, P_Pranatha, P_Nikitha]);
+
+    const P_Padma      = person('Padma','f');
+    const P_VijayKumar = person('Vijay Kumar','m');
+    marry(P_Padma, P_VijayKumar);
+      const P_Sravanthi = person('Sravanthi','f');
+      const P_Alakya    = person('Alakya','f');
+    addChildren(P_Padma, P_VijayKumar, [P_Sravanthi, P_Alakya]);
+
+    const P_Rama_V = person('Rama','f');
+    const P_Raju_V = person('Raju','m');
+    marry(P_Rama_V, P_Raju_V);
+      const P_Ramprasad = person('Ramprasad','m');
+      const P_Bhavani   = person('Bhavani','f');
+    addChildren(P_Rama_V, P_Raju_V, [P_Ramprasad, P_Bhavani]);
+
+  addChildren(P_Veeraiah, P_Mallamma, [P_Kumar, P_Srinu_V, P_Padma, P_Rama_V]);
+
+  const P_Mallaiah = person('Mallaiah','m');
+  const P_Upendra  = person('Upendra','f');
+  marry(P_Mallaiah, P_Upendra);
+
+    const P_Srinu_M     = person('Srinu','m');
+    const P_RamaSujatha = person('Rama (Sujatha)','f');
+    marry(P_Srinu_M, P_RamaSujatha);
+      const P_Thirumal  = person('Thirumal','m');
+      const P_SaiTeja   = person('Sai Teja','m');
+      const P_SaiCharan = person('Sai Charan','m');
+    addChildren(P_Srinu_M, P_RamaSujatha, [P_Thirumal, P_SaiTeja, P_SaiCharan]);
+
+    const P_Devaraj = person('Devaraj','m');
+    const P_Anusha  = person('Anusha','f');
+    marry(P_Devaraj, P_Anusha);
+      const P_Swetha    = person('Swetha','f');
+      const P_RamCharan = person('Ram Charan','m');
+    addChildren(P_Devaraj, P_Anusha, [P_Swetha, P_RamCharan]);
+
+    const P_Shoba  = person('Shoba','f');
+    const P_Ravi_S = person('Ravi','m');
+    marry(P_Shoba, P_Ravi_S);
+      const P_Mounika  = person('Mounika','f');
+      const P_Rajesh_M = person('Rajesh','m');
+      marry(P_Mounika, P_Rajesh_M);
+        const P_Nihanshi = person('Nihanshi','f');
+        const P_Yeshwik  = person('Yeshwik','m');
+      addChildren(P_Mounika, P_Rajesh_M, [P_Nihanshi, P_Yeshwik]);
+      const P_Prasad    = person('Prasad','m');
+      const P_Keerthana = person('Keerthana','f');
+      marry(P_Prasad, P_Keerthana);
+    addChildren(P_Shoba, P_Ravi_S, [P_Mounika, P_Prasad]);
+
+  addChildren(P_Mallaiah, P_Upendra, [P_Srinu_M, P_Devaraj, P_Shoba]);
+
+  const P_Komuraiah = person('Komuraiah','m');
+  const P_Pramila   = person('Pramila','f');
+  marry(P_Komuraiah, P_Pramila);
+    const P_Ravi_K    = person('Ravi','m');
+    const P_Sujatha_K = person('Sujatha','f');
+    marry(P_Ravi_K, P_Sujatha_K);
+      const P_Satwik  = person('Satwik','m');
+      const P_Seshank = person('Seshank','m');
+    addChildren(P_Ravi_K, P_Sujatha_K, [P_Satwik, P_Seshank]);
+    const P_Sridhar = person('Sridhar','m');
+    const P_Saritha = person('Saritha','f');
+    marry(P_Sridhar, P_Saritha);
+      const P_Krishnavihan = person('Krishnavihan','m');
+      const P_Anirudh      = person('Anirudh','m');
+    addChildren(P_Sridhar, P_Saritha, [P_Krishnavihan, P_Anirudh]);
+  addChildren(P_Komuraiah, P_Pramila, [P_Ravi_K, P_Sridhar]);
+
+addChildren(P_Kanakaiah, P_Laxmi_K, [P_Veeraiah, P_Mallaiah, P_Komuraiah]);
+
+/* ── VERAMALLU ── */
+const P_Veramallu = person('Veramallu','m');
+const P_Samakka   = person('Samakka','f');
+marry(P_Veramallu, P_Samakka);
+
+  const P_Veeraswamy = person('Veeraswamy','m');
+  const P_Komuramma  = person('Komuramma','f');
+  marry(P_Veeraswamy, P_Komuramma);
+    const P_Venkatesh_V = person('Venkatesh','m');
+    const P_Jyothi      = person('Jyothi','f');
+    marry(P_Venkatesh_V, P_Jyothi);
+      const P_Archith  = person('Archith','m');
+      const P_Ashmitha = person('Ashmitha','f');
+    addChildren(P_Venkatesh_V, P_Jyothi, [P_Archith, P_Ashmitha]);
+    const P_Chandramuli = person('Chandramuli','m');
+    const P_Ramya_C     = person('Ramya','f');
+    marry(P_Chandramuli, P_Ramya_C);
+      const P_Vihan     = person('Vihan','m');
+      const P_Srikshara = person('Srikshara','f');
+    addChildren(P_Chandramuli, P_Ramya_C, [P_Vihan, P_Srikshara]);
+  addChildren(P_Veeraswamy, P_Komuramma, [P_Venkatesh_V, P_Chandramuli]);
+
+  const P_Suraiah  = person('Suraiah','m');
+  const P_Buchamma = person('Buchamma','f');
+  marry(P_Suraiah, P_Buchamma);
+    const P_Rajamuli = person('Rajamuli','m');
+    const P_Srilatha = person('Srilatha','f');
+    marry(P_Rajamuli, P_Srilatha);
+      const P_Vivek = person('Vivek','m');
+      const P_Rahul = person('Rahul','m');
+    addChildren(P_Rajamuli, P_Srilatha, [P_Vivek, P_Rahul]);
+    const P_Sujatha_S    = person('Sujatha','f');
+    const P_Krishna_S    = person('Krishna','m');
+    marry(P_Sujatha_S, P_Krishna_S);
+      const P_Ramya_S      = person('Ramya','f');
+      const P_ChandramuliS = person('Chandramuli','m');
+      marry(P_Ramya_S, P_ChandramuliS);
+      const P_Rashi = person('Rashi','f');
+      const P_Anil  = person('Anil','m');
+      marry(P_Rashi, P_Anil);
+    addChildren(P_Sujatha_S, P_Krishna_S, [P_Ramya_S, P_Rashi]);
+  addChildren(P_Suraiah, P_Buchamma, [P_Rajamuli, P_Sujatha_S]);
+
+  const P_Laxminarayana = person('Laxminarayana','m');
+  const P_Vijaya_L      = person('Vijaya','f');
+  marry(P_Laxminarayana, P_Vijaya_L);
+    const P_Vinay_L   = person('Vinay','m');
+    const P_Gauthami  = person('Gauthami','f');
+    const P_Govardhan = person('Govardhan','m');
+    marry(P_Gauthami, P_Govardhan);
+      const P_KenishaYuga = person('Kenisha Yuga','f');
+    addChildren(P_Gauthami, P_Govardhan, [P_KenishaYuga]);
+  addChildren(P_Laxminarayana, P_Vijaya_L, [P_Vinay_L, P_Gauthami]);
+
+  const P_Komurelli = person('Komurelli','m');
+  const P_Savitha   = person('Savitha','f');
+  marry(P_Komurelli, P_Savitha);
+    const P_SravanKumar   = person('Sravan Kumar','m');
+    const P_Bindhusree    = person('Bindhusree','f');
+    marry(P_SravanKumar, P_Bindhusree);
+    const P_Navya        = person('Navya','f');
+    const P_KranthiKumar = person('Kranthi Kumar','m');
+    marry(P_Navya, P_KranthiKumar);
+      const P_Aarushnandhan = person('Aarushnandhan','m');
+    addChildren(P_Navya, P_KranthiKumar, [P_Aarushnandhan]);
+  addChildren(P_Komurelli, P_Savitha, [P_SravanKumar, P_Navya]);
+
+  const P_Alivela = person('Alivela','f');
+  const P_Sampath = person('Sampath','m');
+  marry(P_Alivela, P_Sampath);
+    const P_Naveen      = person('Naveen','m');
+    const P_Rajinikanth = person('Rajinikanth','m');
+    const P_Rachana     = person('Rachana','f');
+    const P_Naresh_R    = person('Naresh','m');
+    marry(P_Rachana, P_Naresh_R);
+      const P_Riyansh  = person('Riyansh','m');
+      const P_Ruthvika = person('Ruthvika','f');
+    addChildren(P_Rachana, P_Naresh_R, [P_Riyansh, P_Ruthvika]);
+  addChildren(P_Alivela, P_Sampath, [P_Naveen, P_Rajinikanth, P_Rachana]);
+
+  const P_Laxmi_VD = person('Laxmi','f');
+  const P_Raju_VD  = person('Raju','m');
+  marry(P_Laxmi_VD, P_Raju_VD);
+    const P_Prem    = person('Prem','m');
+    const P_Dinesh  = person('Dinesh','m');
+    const P_Bharath = person('Bharath','m');
+  addChildren(P_Laxmi_VD, P_Raju_VD, [P_Prem, P_Dinesh, P_Bharath]);
+
+addChildren(P_Veramallu, P_Samakka, [P_Veeraswamy, P_Suraiah, P_Laxminarayana, P_Komurelli, P_Alivela, P_Laxmi_VD]);
+
+/* ── NARSAIAH ── */
+const P_Narsaiah = person('Narsaiah','m');
+const P_Yellamma = person('Yellamma','f');
+marry(P_Narsaiah, P_Yellamma);
+
+  const P_Sambaiah  = person('Sambaiah','m');
+  const P_Yakalaxmi = person('Yakalaxmi','f');
+  marry(P_Sambaiah, P_Yakalaxmi);
+    const P_Venkatesh_N = person('Venkatesh','m');
+    const P_Rajkumar    = person('Rajkumar','m');
+    const P_Manasa      = person('Manasa','f');
+    marry(P_Rajkumar, P_Manasa);
+      const P_Lashvika = person('Lashvika','f');
+    addChildren(P_Rajkumar, P_Manasa, [P_Lashvika]);
+  addChildren(P_Sambaiah, P_Yakalaxmi, [P_Venkatesh_N, P_Rajkumar]);
+
+  const P_Sambalaxmi = person('Sambalaxmi','f');
+  const P_Ielaiah    = person('Ielaiah','m');
+  marry(P_Sambalaxmi, P_Ielaiah);
+    const P_Sateesh  = person('Sateesh','m');
+    const P_Rajitha  = person('Rajitha','f');
+    marry(P_Sateesh, P_Rajitha);
+      const P_Vinay_S  = person('Vinay','m');
+      const P_Hasini   = person('Hasini','f');
+    addChildren(P_Sateesh, P_Rajitha, [P_Vinay_S, P_Hasini]);
+    const P_Swapna    = person('Swapna','f');
+    const P_Rajendhar = person('Rajendhar','m');
+    marry(P_Swapna, P_Rajendhar);
+      const P_Abhilash   = person('Abhilash','m');
+      const P_Siddhartha = person('Siddhartha','m');
+    addChildren(P_Swapna, P_Rajendhar, [P_Abhilash, P_Siddhartha]);
+  addChildren(P_Sambalaxmi, P_Ielaiah, [P_Sateesh, P_Swapna]);
+
+  const P_Vijaya_N = person('Vijaya','f');
+  const P_Sadhaiah = person('Sadhaiah','m');
+  marry(P_Vijaya_N, P_Sadhaiah);
+    const P_Sujatha_N = person('Sujatha','f');
+    const P_Rajesh_N  = person('Rajesh','m');
+    marry(P_Sujatha_N, P_Rajesh_N);
+      const P_Dharshanik = person('Dharshanik','m');
+      const P_Chaitra    = person('Chaitra','f');
+    addChildren(P_Sujatha_N, P_Rajesh_N, [P_Dharshanik, P_Chaitra]);
+    const P_Labanya = person('Labanya','f');
+    const P_Raju_L  = person('Raju','m');
+    marry(P_Labanya, P_Raju_L);
+      const P_Nagaraju  = person('Nagaraju','m');
+      const P_Chabandhi = person('Chabandhi','f');
+      marry(P_Nagaraju, P_Chabandhi);
+        const P_Sai      = person('Sai','m');
+        const P_Thansika = person('Thansika','f');
+      addChildren(P_Nagaraju, P_Chabandhi, [P_Sai, P_Thansika]);
+    addChildren(P_Labanya, P_Raju_L, [P_Nagaraju]);
+  addChildren(P_Vijaya_N, P_Sadhaiah, [P_Sujatha_N, P_Labanya]);
+
+  const P_Laxmi_ND = person('Laxmi','f');
+  const P_Raju_ND  = person('Raju','m');
+  marry(P_Laxmi_ND, P_Raju_ND);
+    const P_Nithish = person('Nithish','m');
+    const P_Akshara = person('Akshara','f');
+  addChildren(P_Laxmi_ND, P_Raju_ND, [P_Nithish, P_Akshara]);
+
+addChildren(P_Narsaiah, P_Yellamma, [P_Sambaiah, P_Sambalaxmi, P_Vijaya_N, P_Laxmi_ND]);
+
+/* ── BADRAIAH ── */
+const P_Badraiah  = person('Badraiah','m');
+const P_Kamulamma = person('Kamulamma','f');
+marry(P_Badraiah, P_Kamulamma);
+  const P_Pushpanila = person('Pushpanila','f');
+  const P_Sudhakar   = person('Sudhakar','m');
+  marry(P_Pushpanila, P_Sudhakar);
+    const P_Shivaraj = person('Shivaraj','m');
+    const P_Rakesh_B = person('Rakesh','m');
+  addChildren(P_Pushpanila, P_Sudhakar, [P_Shivaraj, P_Rakesh_B]);
+addChildren(P_Badraiah, P_Kamulamma, [P_Pushpanila]);
+
+/* ── LAXMIAKKA ── */
+const P_Laxmiakka  = person('Laxmiakka','f');
+const P_Ielakka    = person('Ielakka','f');
+const P_Veeralaxmi = person('Veeralaxmi','f');
+addChildren(P_Laxmiakka, null, [P_Ielakka, P_Veeralaxmi]);
+
+/* ROOT CHILDREN */
+addChildren(P_Veraiah, P_Laxminasamma,
+  [P_Kanakaiah, P_Veramallu, P_Narsaiah, P_Badraiah, P_Laxmiakka]);
+
+/* ============================================================
+   RELATIONSHIP ENGINE — BFS + LCA
+============================================================ */
+function ancestorMap(id){
+  const dist = new Map();
+  const q = [[id,0]];
+  while(q.length){
+    const [cur,d]=q.shift(); if(dist.has(cur)) continue;
+    dist.set(cur,d);
+    const p=G[cur]; if(!p) continue;
+    if(p.fatherId) q.push([p.fatherId,d+1]);
+    if(p.motherId) q.push([p.motherId,d+1]);
+  }
+  return dist;
+}
+function findLCA(aId,bId){
+  const ancsA=ancestorMap(aId), ancsB=ancestorMap(bId);
+  let best=null;
+  ancsA.forEach((dA,node)=>{
+    if(ancsB.has(node)){
+      const dB=ancsB.get(node), total=dA+dB;
+      if(!best||total<best.total||(total===best.total&&dA<best.dA)) best={lca:node,dA,dB,total};
+    }
+  });
+  return best;
+}
+function ordinal(n){ const s=['th','st','nd','rd'],v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+
+function computeRel(youId, targetId){
+  if(!youId||!targetId) return null;
+  if(youId===targetId) return 'You';
+  const you=G[youId], tgt=G[targetId];
+  if(!you||!tgt) return null;
+  const f=tgt.gender==='f';
+  if(you.spouseId===targetId) return 'Spouse';
+  const lca=findLCA(youId,targetId);
+  if(!lca){
+    const partner=Object.values(G).find(p=>p.spouseId===targetId);
+    if(partner){
+      const pRel=computeRel(youId,partner.id); if(!pRel) return null;
+      if(pRel==='Father'||pRel==='Mother')         return f?'MotherInLaw':'FatherInLaw';
+      if(pRel==='Son'||pRel==='Daughter')           return f?'DaughterInLaw':'SonInLaw';
+      if(pRel==='Brother'||pRel==='Sister')         return f?'SisterInLaw':'BrotherInLaw';
+      if(pRel==='Uncle'||pRel==='Aunt')             return f?'AuntMarriage':'UncleMarriage';
+      if(pRel&&pRel.includes('Cousin'))             return 'CousinSpouse';
+      if(pRel==='Grandson'||pRel==='Granddaughter') return f?'GranddaughterInLaw':'GrandsonInLaw';
+      return null;
+    }
+    return null;
+  }
+  const {dA,dB}=lca;
+  if(dA===0){
+    if(dB===1) return f?'Daughter':'Son';
+    if(dB===2) return f?'Granddaughter':'Grandson';
+    if(dB===3) return f?'GreatGranddaughter':'GreatGrandson';
+    return `${dB-1}xGreatGrand${f?'daughter':'son'}`;
+  }
+  if(dB===0){
+    if(dA===1) return f?'Mother':'Father';
+    if(dA===2) return f?'Grandmother':'Grandfather';
+    if(dA===3) return f?'GreatGrandmother':'GreatGrandfather';
+    return `${dA-1}xGreatGrand${f?'mother':'father'}`;
+  }
+  if(dA===1&&dB===1) return f?'Sister':'Brother';
+  if(dA===2&&dB===1) return f?'Aunt':'Uncle';
+  if(dA===1&&dB===2) return f?'Niece':'Nephew';
+  if(dA===3&&dB===1) return f?'GrandAunt':'GrandUncle';
+  if(dA===1&&dB===3) return f?'GrandNiece':'GrandNephew';
+  if(dA>=4&&dB===1)  return f?`${dA-2}xGrGrandAunt`:`${dA-2}xGrGrandUncle`;
+  if(dA===1&&dB>=4)  return f?`${dB-2}xGrGrandNiece`:`${dB-2}xGrGrandNephew`;
+  if(dA===dB){ const n=dA-1; return n===1?'Cousin':`${ordinal(n)}Cousin`; }
+  const minD=Math.min(dA,dB), removed=Math.abs(dA-dB), n=minD-1;
+  return `${n<=1?'1stCousin':ordinal(n)+'Cousin'}Rem${removed}`;
+}
+
+/* Translate a relation key to display string */
+function relLabel(key){
+  if(!key) return '';
+  // Handle generated compound keys
+  if(key.includes('xGreatGrand')){
+    const m=key.match(/^(\d+)xGreatGrand(son|daughter|mother|father)$/);
+    if(m) return lang==='te'
+      ? `${m[1]}వ తరం పెద్ద${m[2]==='son'?'మనవడు':m[2]==='daughter'?'మనవరాలు':m[2]==='mother'?'నానమ్మ':'తాత'}`
+      : `${m[1]}× Great-Grand${m[2]}`;
+  }
+  if(key.includes('Cousin')){
+    const remM = key.match(/(.+)Rem(\d+)/);
+    if(remM){
+      const base=relLabel(remM[1].replace(/\d+/,'')==='1stCousin'?'Cousin':remM[1]);
+      return lang==='te'?`${base} (${remM[2]} తరం దూరం)`:`${base} (${remM[2]}× removed)`;
+    }
+    const ordM = key.match(/^(\d+(?:st|nd|rd|th))Cousin$/);
+    if(ordM) return lang==='te'?`${ordM[1]} దూర బంధువు`:`${ordM[1]} Cousin`;
+    return t('Cousin');
+  }
+  // Simple keys
+  return t(key) || key;
+}
+
+function buildRelMap(youId){
+  const map={};
+  Object.keys(G).forEach(id=>{
+    const r=computeRel(youId,id);
+    if(r) map[id]=r;
+  });
+  return map;
+}
+
+/* ============================================================
+   STATE
+============================================================ */
+let youId=null, relMap={}, collapsed={};
+
+/* ============================================================
+   TREE RENDERER
+============================================================ */
+function renderNodeHTML(id){
+  const p=G[id]; if(!p) return '';
+  const isYou=id===youId;
+  const relKey=relMap[id]||null;
+  const relDisp=relKey?relLabel(relKey):'';
+
+  const boxCls='node-box'+(isYou?' is-you':'');
+  const nameCls='node-name'+(isYou?' you-nm':'');
+  const relCls='node-rel'+(isYou?' rel-you':'');
+
+  let couple=`<div class="couple-wrap">
+    <div class="${boxCls}" onclick="nodeClick('${id}')">
+      <span class="${nameCls}">${p.name}</span>
+      ${relDisp?`<span class="${relCls}">${relDisp}</span>`:''}
+    </div>`;
+
+  if(p.spouseId&&G[p.spouseId]){
+    const sp=G[p.spouseId];
+    const spIsYou=p.spouseId===youId;
+    const spRelKey=relMap[p.spouseId]||null;
+    const spRelDisp=spRelKey?relLabel(spRelKey):'';
+    const spBox='node-box'+(spIsYou?' is-you':'');
+    const spName='node-name'+(spIsYou?' you-nm':'');
+    const spRc='node-rel'+(spIsYou?' rel-you':'');
+    couple+=`<div class="sp-line"></div>
+    <div class="${spBox}" onclick="nodeClick('${p.spouseId}')">
+      <span class="${spName}">${sp.name}</span>
+      ${spRelDisp?`<span class="${spRc}">${spRelDisp}</span>`:''}
+    </div>`;
+  }
+  couple+='</div>';
+
+  const hasChildren=p.childrenIds&&p.childrenIds.length>0;
+  const isColl=collapsed[id];
+  let childHTML='';
+  if(hasChildren){
+    childHTML=`<div class="ch-area">
+      <div class="v-conn" style="height:10px"></div>
+      <div class="tog" onclick="togNode(event,'${id}')">${isColl?'+':'&minus;'}</div>`;
+    if(!isColl){
+      childHTML+=`<div class="v-conn" style="height:8px"></div>`;
+      childHTML+=renderChildrenRow(p.childrenIds);
+    }
+    childHTML+='</div>';
+  }
+  return `<div class="p-col">${couple}${childHTML}</div>`;
+}
+
+function renderChildrenRow(ids){
+  const valid=ids.filter(id=>G[id]); if(!valid.length) return '';
+  const cols=valid.map(cid=>`<div class="ch-col"><div class="v-conn" style="height:12px"></div>${renderNodeHTML(cid)}</div>`).join('');
+  const bar=valid.length>1?`<div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:calc(100% - 90px);height:1.5px;background:linear-gradient(90deg,transparent,#A07820,#A07820,transparent)"></div>`:'';
+  return `<div class="ch-row">${bar}${cols}</div>`;
+}
+
+function renderTree(){
+  const canvas=document.getElementById('tree-canvas');
+  if(canvas) canvas.innerHTML=renderNodeHTML(P_Veraiah);
+}
+
+/* ============================================================
+   TOOLBAR
+============================================================ */
+function renderToolbar(){
+  const tb=document.getElementById('toolbar'); if(!tb) return;
+  tb.innerHTML=`
+    <div class="lang-toggle">
+      <button class="lang-opt${lang==='en'?' active':''}" onclick="setLang('en')">${T.en.btnLangEn}</button>
+      <button class="lang-opt${lang==='te'?' active':''}" onclick="setLang('te')">${T.te.btnLangTe} తెలుగు</button>
+    </div>
+    <button class="btn btn-primary" onclick="openModal()">${t('btnRelation')}</button>
+    <button class="btn" onclick="expandAll()">${t('btnExpand')}</button>
+    <button class="btn" onclick="collapseAll()">${t('btnCollapse')}</button>
+    ${youId?`<button class="btn btn-danger" onclick="clearYou()">${t('btnClear')}</button>`:''}`;
+}
+
+function renderYouBar(){
+  const bar=document.getElementById('you-bar'); if(!bar) return;
+  if(youId){
+    bar.style.display='block';
+    bar.innerHTML=`${t('youBarPrefix')} <b>${G[youId].name}</b> &nbsp;·&nbsp; ${t('youBarSuffix')}`;
+  } else { bar.style.display='none'; }
+}
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+function nodeClick(id){}
+function togNode(e,id){ e.stopPropagation(); collapsed[id]=!collapsed[id]; renderTree(); }
+function expandAll(){ collapsed={}; renderTree(); }
+function collapseAll(){ Object.keys(G).forEach(id=>{ if(G[id].childrenIds&&G[id].childrenIds.length) collapsed[id]=true; }); renderTree(); }
+function clearYou(){ youId=null; relMap={}; renderToolbar(); renderYouBar(); renderTree(); }
+function setYou(id){ youId=id; relMap=buildRelMap(id); renderToolbar(); renderYouBar(); renderTree(); }
+
+/* ============================================================
+   MODAL
+============================================================ */
+function openModal(){
+  const fathersList=Object.values(G).filter(p=>p.childrenIds&&p.childrenIds.length).sort((a,b)=>a.name.localeCompare(b.name));
+  const fOpts=fathersList.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
+  const teFont=lang==='te'?'font-family:"Noto Serif Telugu",serif;':' ';
+  document.getElementById('modal-root').innerHTML=`
+    <div class="modal-overlay" id="moverlay" onclick="mClick(event)">
+      <div class="modal" style="${teFont}">
+        <h2>${t('modalTitle')}</h2>
+        <p>${t('modalDesc')}</p>
+        <div class="fgrp">
+          <label>${t('labelName')}</label>
+          <input id="inp-name" placeholder="${t('placeholderName')}" onkeydown="if(event.key==='Enter')doFind()"/>
+        </div>
+        <div class="fgrp">
+          <label>${t('labelFather')} <span style="font-size:.55rem;opacity:.55">${t('labelFatherHint')}</span></label>
+          <select id="inp-father">
+            <option value="">${t('fatherDefault')}</option>
+            ${fOpts}
+          </select>
+        </div>
+        <div id="modal-err" class="modal-err"></div>
+        <div class="modal-divider"></div>
+        <div class="modal-footer">
+          <button class="btn" onclick="closeModal()">${t('btnCancel')}</button>
+          <button class="btn btn-primary" onclick="doFind()">${t('btnFind')}</button>
+        </div>
+      </div>
+    </div>`;
+  setTimeout(()=>{ const el=document.getElementById('inp-name'); if(el) el.focus(); },50);
+}
+function mClick(e){ if(e.target.id==='moverlay') closeModal(); }
+function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
+function doFind(){
+  const name=(document.getElementById('inp-name').value||'').trim().toLowerCase();
+  const fid=document.getElementById('inp-father').value;
+  const err=document.getElementById('modal-err');
+  if(!name){ err.textContent=t('errNoName'); return; }
+  let matches=Object.values(G).filter(p=>p.name.toLowerCase()===name);
+  if(fid) matches=matches.filter(p=>p.fatherId===fid||p.motherId===fid);
+  if(matches.length===0){ err.textContent=t('errNotFound'); return; }
+  if(matches.length>1)  { err.textContent=t('errMultiple'); return; }
+  closeModal(); setYou(matches[0].id);
+}
+
+/* ============================================================
+   ZOOM & PAN
+============================================================ */
+let scale=0.85, tx=0, ty=20, isPanning=false, lastX=0, lastY=0;
+function applyT(anim){
+  const c=document.getElementById('tree-canvas'); if(!c) return;
+  c.style.transition=anim?'transform 0.28s ease':'none';
+  c.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;
+  document.getElementById('zoom-label').textContent=Math.round(scale*100)+'%';
+}
+function centerTree(){
+  const vp=document.getElementById('tree-viewport'), c=document.getElementById('tree-canvas');
+  if(!vp||!c) return;
+  tx=Math.max((vp.clientWidth-c.scrollWidth*scale)/2,20); ty=20; applyT(true);
+}
+document.getElementById('zoom-in').onclick=()=>{scale=Math.min(scale*1.2,3);applyT(true)};
+document.getElementById('zoom-out').onclick=()=>{scale=Math.max(scale/1.2,0.15);applyT(true)};
+document.getElementById('zoom-reset').onclick=()=>{scale=0.85;centerTree()};
+const vp=document.getElementById('tree-viewport');
+vp.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const d=e.deltaY>0?0.9:1.1, r=vp.getBoundingClientRect();
+  const mx=e.clientX-r.left, my=e.clientY-r.top;
+  const ns=Math.min(Math.max(scale*d,0.15),3);
+  tx=mx-(mx-tx)*(ns/scale); ty=my-(my-ty)*(ns/scale); scale=ns; applyT(false);
+},{passive:false});
+vp.addEventListener('mousedown',e=>{if(e.button!==0)return;isPanning=true;lastX=e.clientX;lastY=e.clientY;vp.classList.add('panning')});
+window.addEventListener('mousemove',e=>{if(!isPanning)return;tx+=e.clientX-lastX;ty+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;applyT(false)});
+window.addEventListener('mouseup',()=>{isPanning=false;vp.classList.remove('panning')});
+let ltx=0,lty=0,ld=0;
+vp.addEventListener('touchstart',e=>{
+  if(e.touches.length===1){ltx=e.touches[0].clientX;lty=e.touches[0].clientY;}
+  else if(e.touches.length===2) ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+},{passive:true});
+vp.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){tx+=e.touches[0].clientX-ltx;ty+=e.touches[0].clientY-lty;ltx=e.touches[0].clientX;lty=e.touches[0].clientY;applyT(false);}
+  else if(e.touches.length===2){
+    const nd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(ld){scale=Math.min(Math.max(scale*(nd/ld),0.15),3);applyT(false);}ld=nd;
+  }
+},{passive:false});
+
+/* ============================================================
+   TIMELINE
+============================================================ */
+function buildTimeline(){
+  const track=document.getElementById('timeline-track');
+  const seg=`<span class="timeline-seg"><span class="timeline-gem"></span><span class="timeline-text">${t('timeline')}</span><span class="timeline-gem"></span></span>`;
+  track.innerHTML=seg.repeat(6);
+}
+
+/* ============================================================
+   BOOT
+============================================================ */
+applyUIStrings();
+renderToolbar();
+renderYouBar();
+renderTree();
+buildTimeline();
+setTimeout(centerTree,120);
+</script>
+</body>
+</html>
