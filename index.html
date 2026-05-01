@@ -2,222 +2,480 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Thota Family Tree · థోటా వంశ వృక్షం</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+Telugu:wght@300;400;500;600&family=Noto+Serif:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,400&family=Noto+Serif+Telugu:wght@300;400;500;600&family=Noto+Serif:wght@300;400&display=swap" rel="stylesheet">
 <style>
+/* ================================================================
+   RESET & CSS VARIABLES
+================================================================ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --saffron:#FF9933;--saffron-lt:#FFB566;--saffron-dk:#CC6600;
   --gold:#D4AF37;--gold-lt:#F0D060;--gold-dk:#A07820;
   --maroon:#800020;--maroon-lt:#A0304A;--maroon-dk:#500010;
+  --green-dk:#1B4332;--green:#2D6A4F;
   --cream:#FDF6E3;--cream-dk:#F5E8C0;
-  --ink:#1A0800;
+  --ink:#1A0800;--ink-lt:#3D1A00;--muted:#7A5C3A;
   --node-bg:rgba(253,246,227,0.97);
   --node-border:#C8921A;
   --shadow-warm:rgba(180,100,0,0.18);
-  --glow-you:rgba(255,153,51,0.6);
+  --glow-you:rgba(255,153,51,0.65);
+  --path-color:#FFD700;
+  --search-glow:rgba(255,215,0,0.8);
+  --dim-opacity:0.18;
+  --transition-speed:0.25s;
 }
-html,body{width:100%;min-height:100vh;background:var(--ink);color:var(--ink);font-family:'Crimson Pro',Georgia,serif;overflow-x:hidden}
 
-/* ── TELUGU FONT BODY CLASS ── */
-body.lang-te{font-family:'Noto Serif Telugu',serif}
-body.lang-te .header h1{font-family:'Noto Serif Telugu',serif;letter-spacing:0.02em}
-body.lang-te .btn{font-family:'Noto Serif Telugu',serif;letter-spacing:0.01em}
-body.lang-te .node-name{font-family:'Noto Serif Telugu',serif;font-size:0.7rem}
-body.lang-te .node-rel{font-family:'Noto Serif Telugu',serif;font-size:0.6rem}
-body.lang-te .modal h2{font-family:'Noto Serif Telugu',serif}
-body.lang-te .fgrp label{font-family:'Noto Serif Telugu',serif;letter-spacing:0.01em}
-body.lang-te .modal p{font-family:'Noto Serif Telugu',serif}
-body.lang-te .header-sub{font-family:'Noto Serif Telugu',serif;letter-spacing:0.05em}
-body.lang-te .you-bar{font-family:'Noto Serif Telugu',serif}
-body.lang-te .zoom-label{font-family:'Noto Serif Telugu',serif}
-body.lang-te .leg-item{font-family:'Noto Serif Telugu',serif}
-body.lang-te .hint-bar{font-family:'Noto Serif Telugu',serif;letter-spacing:0.02em}
+html,body{width:100%;min-height:100vh;background:var(--ink);color:var(--ink);
+  font-family:'Crimson Pro',Georgia,serif;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
 
-/* ── LANG TOGGLE BUTTON ── */
-.lang-toggle{
-  display:inline-flex;align-items:center;gap:0;
-  border-radius:20px;overflow:hidden;
-  border:1px solid rgba(212,175,55,0.5);
-  background:rgba(26,8,0,0.8);
-}
-.lang-opt{
-  padding:0.38rem 0.85rem;
-  font-size:0.7rem;cursor:pointer;
-  transition:all .2s;color:rgba(240,208,96,0.6);
-  font-family:'Cinzel',serif;letter-spacing:0.08em;
-  border:none;background:transparent;
-}
-.lang-opt.active{
-  background:linear-gradient(135deg,var(--maroon),var(--maroon-lt));
-  color:var(--cream);font-weight:600;
-}
-.lang-opt:first-child{border-right:1px solid rgba(212,175,55,0.25)}
+/* ── TELUGU MODE ── */
+body.lang-te .header h1,body.lang-te .btn,body.lang-te .node-rel,
+body.lang-te .modal h2,body.lang-te .fgrp label,body.lang-te .modal p,
+body.lang-te .header-sub,body.lang-te .you-bar,body.lang-te .leg-item,
+body.lang-te .hint-bar,body.lang-te .search-wrap input,
+body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif}
+body.lang-te .node-rel{font-size:0.58rem;letter-spacing:0}
+body.lang-te .btn{letter-spacing:0.01em}
 
-/* BG */
-.bg-layer{position:fixed;inset:0;z-index:0;
+/* ================================================================
+   BACKGROUND — Mandala / Rangoli
+================================================================ */
+.bg-layer{position:fixed;inset:0;z-index:0;overflow:hidden;
   background:radial-gradient(ellipse at 50% 0%,rgba(212,175,55,0.18) 0%,transparent 60%),
   radial-gradient(ellipse at 0% 100%,rgba(128,0,32,0.2) 0%,transparent 50%),
-  radial-gradient(ellipse at 100% 100%,rgba(255,153,51,0.12) 0%,transparent 50%),#1A0800;overflow:hidden}
+  radial-gradient(ellipse at 100% 100%,rgba(255,153,51,0.12) 0%,transparent 50%),#1A0800}
 .bg-layer::before{content:'';position:absolute;inset:0;
-  background-image:repeating-linear-gradient(0deg,rgba(212,175,55,0.04) 0px,transparent 1px,transparent 40px,rgba(212,175,55,0.04) 41px),
-  repeating-linear-gradient(90deg,rgba(212,175,55,0.04) 0px,transparent 1px,transparent 40px,rgba(212,175,55,0.04) 41px)}
-.bg-layer::after{content:'';position:absolute;width:900px;height:900px;top:50%;left:50%;
-  transform:translate(-50%,-50%);border-radius:50%;
-  background:radial-gradient(circle at 50% 50%,transparent 38%,rgba(212,175,55,0.06) 39%,transparent 40%,transparent 44%,rgba(212,175,55,0.05) 45%,transparent 46%,transparent 49%,rgba(212,175,55,0.04) 50%,transparent 51%);
-  animation:mandala-spin 80s linear infinite}
+  background-image:
+    repeating-linear-gradient(0deg,rgba(212,175,55,0.035) 0,transparent 1px,transparent 44px,rgba(212,175,55,0.035) 45px),
+    repeating-linear-gradient(90deg,rgba(212,175,55,0.035) 0,transparent 1px,transparent 44px,rgba(212,175,55,0.035) 45px)}
+/* Animated mandala rings */
+.bg-layer::after{content:'';position:absolute;width:1000px;height:1000px;top:50%;left:50%;
+  transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 50%,
+      transparent 30%,rgba(212,175,55,0.055) 31%,transparent 32%,
+      transparent 38%,rgba(212,175,55,0.045) 39%,transparent 40%,
+      transparent 46%,rgba(212,175,55,0.035) 47%,transparent 48%,
+      transparent 54%,rgba(212,175,55,0.025) 55%,transparent 56%);
+  animation:mandala-spin 90s linear infinite}
 @keyframes mandala-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
-/* CORNERS */
-.corner-decor{position:fixed;width:120px;height:120px;opacity:0.18;z-index:1;pointer-events:none}
+/* SVG Rangoli dots overlay */
+.rangoli-svg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.07}
+
+/* ── CORNER DECORATIONS ── */
+.corner-decor{position:fixed;width:110px;height:110px;opacity:0.16;z-index:1;pointer-events:none}
 .corner-decor.tl{top:0;left:0}.corner-decor.tr{top:0;right:0;transform:scaleX(-1)}
-.corner-decor.bl{bottom:60px;left:0;transform:scaleY(-1)}.corner-decor.br{bottom:60px;right:0;transform:scale(-1,-1)}
+.corner-decor.bl{bottom:48px;left:0;transform:scaleY(-1)}.corner-decor.br{bottom:48px;right:0;transform:scale(-1,-1)}
 
-/* HEADER */
-.header{position:relative;z-index:10;text-align:center;padding:1.5rem 1rem 0.8rem;border-bottom:1px solid rgba(212,175,55,0.25)}
-.header-ornament{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:0.3rem;color:var(--gold)}
-.ornament-line{height:1px;width:60px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.header h1{font-family:'Cinzel',serif;font-size:clamp(1.4rem,4vw,2.5rem);font-weight:700;color:var(--gold-lt);letter-spacing:0.08em;text-shadow:0 2px 20px rgba(212,175,55,0.4);transition:font-family 0.3s}
-.header-sub{font-family:'Noto Serif',serif;font-size:0.78rem;color:var(--saffron-lt);letter-spacing:0.2em;text-transform:uppercase;margin-top:0.25rem;opacity:0.85;transition:all 0.3s}
+/* ================================================================
+   HEADER
+================================================================ */
+.header{position:relative;z-index:10;text-align:center;padding:1.3rem 1rem 0.7rem;
+  border-bottom:1px solid rgba(212,175,55,0.22)}
+.header-ornament{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:0.25rem;color:var(--gold)}
+.ornament-line{height:1px;width:55px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.header h1{font-family:'Cinzel',serif;font-size:clamp(1.3rem,3.5vw,2.4rem);font-weight:700;
+  color:var(--gold-lt);letter-spacing:0.07em;text-shadow:0 2px 20px rgba(212,175,55,0.4);transition:all 0.3s}
+.header-sub{font-family:'Noto Serif',serif;font-size:0.74rem;color:var(--saffron-lt);
+  letter-spacing:0.15em;text-transform:uppercase;margin-top:0.2rem;opacity:0.8}
 
-/* TOOLBAR */
-.toolbar{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;gap:0.5rem;flex-wrap:wrap;padding:0.6rem 1rem;border-bottom:1px solid rgba(212,175,55,0.15)}
-.btn{font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.1em;padding:0.4rem 1rem;border-radius:4px;border:1px solid rgba(212,175,55,0.4);background:rgba(26,8,0,0.7);color:var(--gold-lt);cursor:pointer;transition:all .22s;backdrop-filter:blur(4px)}
-.btn:hover{background:rgba(212,175,55,0.15);border-color:var(--gold);box-shadow:0 0 12px rgba(212,175,55,0.25)}
-.btn-primary{background:linear-gradient(135deg,var(--maroon) 0%,var(--maroon-lt) 100%);border-color:var(--saffron);color:var(--cream)}
-.btn-primary:hover{background:linear-gradient(135deg,var(--maroon-lt) 0%,var(--saffron-dk) 100%);box-shadow:0 0 18px rgba(255,153,51,0.35)}
+/* Last updated badge */
+.last-updated{position:absolute;top:0.6rem;right:0.8rem;font-size:0.62rem;
+  color:rgba(212,175,55,0.5);font-family:'Noto Serif',serif;letter-spacing:0.04em;
+  background:rgba(26,8,0,0.5);border:1px solid rgba(212,175,55,0.15);
+  border-radius:4px;padding:0.18rem 0.5rem;backdrop-filter:blur(4px);
+  white-space:nowrap}
+@media(max-width:480px){.last-updated{position:static;display:block;text-align:center;margin-top:0.3rem}}
+
+/* ================================================================
+   SEARCH BAR
+================================================================ */
+.search-wrap{position:relative;z-index:20;display:flex;align-items:center;justify-content:center;
+  gap:0.5rem;padding:0.55rem 1rem;border-bottom:1px solid rgba(212,175,55,0.12);flex-wrap:wrap}
+.search-box{position:relative;max-width:340px;width:100%}
+.search-box input{width:100%;padding:0.42rem 2.4rem 0.42rem 0.85rem;
+  background:rgba(26,8,0,0.75);border:1px solid rgba(212,175,55,0.35);
+  border-radius:20px;color:var(--cream);font-family:'Crimson Pro',serif;font-size:0.84rem;
+  outline:none;transition:border-color .2s,box-shadow .2s;backdrop-filter:blur(6px)}
+.search-box input:focus{border-color:var(--gold);box-shadow:0 0 12px rgba(212,175,55,0.25)}
+.search-box input::placeholder{color:rgba(212,175,55,0.38);font-style:italic}
+.search-clear{position:absolute;right:0.55rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(212,175,55,0.5);cursor:pointer;
+  font-size:0.9rem;line-height:1;padding:0.15rem;transition:color .15s}
+.search-clear:hover{color:var(--gold)}
+/* Search suggestions dropdown */
+.search-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:100;
+  background:#2C1200;border:1px solid rgba(212,175,55,0.35);border-radius:8px;
+  overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.5);max-height:200px;overflow-y:auto}
+.search-sug-item{padding:0.45rem 0.85rem;font-size:0.78rem;color:var(--cream-dk);
+  cursor:pointer;border-bottom:1px solid rgba(212,175,55,0.1);transition:background .15s;
+  display:flex;flex-direction:column;gap:2px}
+.search-sug-item:last-child{border-bottom:none}
+.search-sug-item:hover{background:rgba(212,175,55,0.12)}
+.search-sug-item .sug-name{font-weight:500;color:var(--gold-lt);font-size:0.8rem}
+.search-sug-item .sug-meta{font-size:0.66rem;color:var(--muted);font-style:italic}
+
+/* ================================================================
+   TOOLBAR
+================================================================ */
+.toolbar{position:relative;z-index:10;display:flex;align-items:center;justify-content:center;
+  gap:0.45rem;flex-wrap:wrap;padding:0.5rem 0.8rem;border-bottom:1px solid rgba(212,175,55,0.12)}
+.btn{font-family:'Cinzel',serif;font-size:0.66rem;letter-spacing:0.08em;
+  padding:0.38rem 0.9rem;border-radius:4px;border:1px solid rgba(212,175,55,0.38);
+  background:rgba(26,8,0,0.7);color:var(--gold-lt);cursor:pointer;
+  transition:all var(--transition-speed);backdrop-filter:blur(4px);
+  -webkit-tap-highlight-color:transparent;min-height:36px;touch-action:manipulation}
+.btn:hover,.btn:active{background:rgba(212,175,55,0.14);border-color:var(--gold);
+  box-shadow:0 0 10px rgba(212,175,55,0.22)}
+.btn-primary{background:linear-gradient(135deg,var(--maroon) 0%,var(--maroon-lt) 100%);
+  border-color:var(--saffron);color:var(--cream)}
+.btn-primary:hover{background:linear-gradient(135deg,var(--maroon-lt) 0%,var(--saffron-dk) 100%);
+  box-shadow:0 0 16px rgba(255,153,51,0.35)}
 .btn-danger{background:rgba(128,0,32,0.3);border-color:rgba(255,100,80,0.4);color:#ffaaaa}
-.you-bar{position:relative;z-index:10;text-align:center;padding:0.32rem 1rem;background:rgba(255,153,51,0.1);border-bottom:1px solid rgba(255,153,51,0.2);font-size:0.75rem;color:var(--saffron-lt);letter-spacing:0.04em;display:none}
+.btn-danger:hover{background:rgba(128,0,32,0.5)}
+
+/* Language toggle pill */
+.lang-toggle{display:inline-flex;align-items:center;border-radius:20px;overflow:hidden;
+  border:1px solid rgba(212,175,55,0.45);background:rgba(26,8,0,0.8)}
+.lang-opt{padding:0.35rem 0.8rem;font-size:0.68rem;cursor:pointer;color:rgba(240,208,96,0.55);
+  font-family:'Cinzel',serif;letter-spacing:0.07em;border:none;background:transparent;
+  transition:all .2s;min-height:34px;touch-action:manipulation}
+.lang-opt.active{background:linear-gradient(135deg,var(--maroon),var(--maroon-lt));
+  color:var(--cream);font-weight:600}
+.lang-opt:first-child{border-right:1px solid rgba(212,175,55,0.2)}
+
+/* You-bar */
+.you-bar{position:relative;z-index:10;text-align:center;padding:0.28rem 1rem;
+  background:rgba(255,153,51,0.1);border-bottom:1px solid rgba(255,153,51,0.2);
+  font-size:0.72rem;color:var(--saffron-lt);letter-spacing:0.03em;display:none}
 .you-bar b{color:var(--gold-lt)}
-.hint-bar{position:relative;z-index:10;text-align:center;padding:0.22rem;font-size:0.66rem;color:rgba(212,175,55,0.35);letter-spacing:0.06em}
+.hint-bar{position:relative;z-index:10;text-align:center;padding:0.18rem;
+  font-size:0.64rem;color:rgba(212,175,55,0.3);letter-spacing:0.05em}
 
-/* TREE VIEWPORT */
-.tree-viewport{position:relative;z-index:5;overflow:hidden;flex:1;cursor:grab;height:calc(100vh - 220px);min-height:400px}
+/* ================================================================
+   TREE VIEWPORT — ZOOM & PAN
+================================================================ */
+.tree-viewport{position:relative;z-index:5;overflow:hidden;flex:1;cursor:grab;
+  height:calc(100vh - 260px);min-height:380px;touch-action:none}
 .tree-viewport.panning{cursor:grabbing}
-.tree-canvas{position:absolute;transform-origin:0 0;padding:3rem 4rem 4rem;display:inline-flex;flex-direction:column;align-items:center;will-change:transform}
+.tree-canvas{position:absolute;transform-origin:0 0;padding:3rem 4rem 5rem;
+  display:inline-flex;flex-direction:column;align-items:center;will-change:transform;
+  transition:transform 0.04s linear}
 
-/* NODES */
+/* ================================================================
+   NODE STYLES
+================================================================ */
 .p-col{display:flex;flex-direction:column;align-items:center}
 .couple-wrap{display:flex;align-items:center}
-.sp-line{width:20px;height:2px;background:linear-gradient(90deg,var(--gold-dk),var(--saffron-dk));flex-shrink:0;position:relative}
-.sp-line::after{content:'✦';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:6px;color:var(--gold)}
-.node-box{min-width:86px;max-width:122px;padding:0.38rem 0.65rem 0.32rem;border-radius:8px;background:var(--node-bg);border:1.5px solid var(--node-border);
-  box-shadow:0 2px 8px var(--shadow-warm),inset 0 1px 0 rgba(255,255,255,0.8);cursor:pointer;text-align:center;position:relative;
-  transition:transform .18s,box-shadow .18s,border-color .18s;animation:node-appear 0.4s ease both}
-@keyframes node-appear{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-.node-box::before{content:'';position:absolute;inset:-1px;border-radius:9px;
-  background:linear-gradient(135deg,rgba(212,175,55,0.3) 0%,transparent 50%,rgba(255,153,51,0.15) 100%);pointer-events:none}
-.node-box:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 6px 20px rgba(180,100,0,0.3),inset 0 1px 0 rgba(255,255,255,0.9);border-color:var(--saffron);z-index:10}
-.node-box.is-you{background:linear-gradient(160deg,#FFF8E0 0%,#FFE8A0 100%);border-color:var(--saffron);
-  box-shadow:0 0 0 3px rgba(255,153,51,0.25),0 0 22px var(--glow-you),0 4px 14px rgba(200,100,0,0.35),inset 0 1px 0 rgba(255,255,255,0.9);
-  animation:you-pulse 2.5s ease-in-out infinite,node-appear 0.4s ease both}
+
+/* Spouse connector line */
+.sp-line{width:18px;height:2px;
+  background:linear-gradient(90deg,var(--gold-dk),var(--saffron-dk));
+  flex-shrink:0;position:relative}
+.sp-line::after{content:'✦';position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);font-size:6px;color:var(--gold)}
+
+/* Node card */
+.node-box{min-width:84px;max-width:118px;padding:0.36rem 0.62rem 0.3rem;
+  border-radius:9px;background:var(--node-bg);border:1.5px solid var(--node-border);
+  box-shadow:0 2px 10px var(--shadow-warm),inset 0 1px 0 rgba(255,255,255,0.75);
+  cursor:pointer;text-align:center;position:relative;
+  transition:transform var(--transition-speed),box-shadow var(--transition-speed),
+    border-color var(--transition-speed),opacity var(--transition-speed);
+  animation:node-appear 0.35s ease both}
+@keyframes node-appear{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.node-box::before{content:'';position:absolute;inset:-1px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(212,175,55,0.28) 0%,transparent 55%,rgba(255,153,51,0.12) 100%);
+  pointer-events:none}
+.node-box:hover{transform:translateY(-2px) scale(1.05);
+  box-shadow:0 8px 22px rgba(180,100,0,0.32),inset 0 1px 0 rgba(255,255,255,0.9);
+  border-color:var(--saffron);z-index:20}
+
+/* YOU highlight */
+.node-box.is-you{background:linear-gradient(155deg,#FFFCE0 0%,#FFE89A 100%);
+  border-color:var(--saffron);z-index:15;
+  box-shadow:0 0 0 3px rgba(255,153,51,0.28),0 0 24px var(--glow-you),
+    0 4px 16px rgba(200,100,0,0.38),inset 0 1px 0 rgba(255,255,255,0.9);
+  animation:you-pulse 2.8s ease-in-out infinite,node-appear 0.35s ease both}
 @keyframes you-pulse{
   0%,100%{box-shadow:0 0 0 3px rgba(255,153,51,0.25),0 0 20px rgba(255,153,51,0.5),0 4px 14px rgba(200,100,0,0.35)}
-  50%{box-shadow:0 0 0 6px rgba(255,153,51,0.12),0 0 36px rgba(255,153,51,0.75),0 4px 18px rgba(200,100,0,0.4)}}
-.node-name{font-family:'Crimson Pro',serif;font-weight:500;font-size:0.74rem;color:var(--ink);line-height:1.25;display:block;transition:font-family 0.3s}
-.node-name.you-nm{color:var(--maroon);font-weight:600}
-.node-rel{display:block;font-family:'Cinzel',serif;font-size:0.54rem;letter-spacing:0.06em;color:var(--maroon-lt);margin-top:2px;line-height:1.3;transition:font-family 0.3s}
-.node-rel.rel-you{color:var(--maroon-dk);font-weight:600;background:rgba(255,153,51,0.2);border-radius:3px;padding:1px 4px}
+  50%  {box-shadow:0 0 0 6px rgba(255,153,51,0.1),0 0 40px rgba(255,153,51,0.8),0 4px 20px rgba(200,100,0,0.45)}}
 
-/* CONNECTORS */
-.v-conn{width:1.5px;background:linear-gradient(180deg,var(--gold-dk),rgba(180,120,0,0.3));flex-shrink:0}
-.tog{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle,var(--cream) 60%,var(--cream-dk) 100%);border:1px solid var(--gold-dk);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:8px;color:var(--maroon);font-weight:700;flex-shrink:0;margin:1px 0;transition:all .18s;box-shadow:0 1px 4px rgba(180,100,0,0.25);font-family:monospace;line-height:1;user-select:none}
-.tog:hover{background:radial-gradient(circle,var(--saffron-lt) 60%,var(--saffron) 100%);border-color:var(--saffron);box-shadow:0 0 8px rgba(255,153,51,0.4)}
+/* SEARCH highlight */
+.node-box.search-hit{border-color:var(--gold-lt);z-index:18;
+  background:linear-gradient(155deg,#FFFFF0 0%,#FFEDAA 100%);
+  box-shadow:0 0 0 3px rgba(255,215,0,0.4),0 0 28px rgba(255,215,0,0.7),0 4px 16px rgba(180,140,0,0.4);
+  animation:search-pulse 1.8s ease-in-out infinite,node-appear 0.35s ease both;
+  transform:scale(1.08)}
+@keyframes search-pulse{
+  0%,100%{box-shadow:0 0 0 3px rgba(255,215,0,0.35),0 0 22px rgba(255,215,0,0.6)}
+  50%    {box-shadow:0 0 0 6px rgba(255,215,0,0.15),0 0 38px rgba(255,215,0,0.9)}}
+
+/* LINEAGE PATH highlight */
+.node-box.on-path{border-color:var(--path-color);z-index:16;
+  box-shadow:0 0 0 2px rgba(255,215,0,0.5),0 0 18px rgba(255,215,0,0.6);
+  background:linear-gradient(155deg,#FFFAE8 0%,#FFE9A0 100%)}
+
+/* DIMMED (when relationship mode active) */
+.node-box.dimmed{opacity:var(--dim-opacity);filter:grayscale(60%)}
+
+/* Node text */
+.node-name{font-family:'Crimson Pro',serif;font-weight:500;font-size:0.73rem;
+  color:var(--ink);line-height:1.25;display:block}
+.node-name.you-nm{color:var(--maroon);font-weight:700}
+.node-rel{display:block;font-family:'Cinzel',serif;font-size:0.54rem;
+  letter-spacing:0.05em;color:var(--maroon-lt);margin-top:2px;line-height:1.3}
+.node-rel.rel-you{color:var(--maroon-dk);font-weight:700;
+  background:rgba(255,153,51,0.22);border-radius:3px;padding:1px 4px}
+
+/* ================================================================
+   TREE CONNECTORS
+================================================================ */
+.v-conn{width:1.5px;background:linear-gradient(180deg,var(--gold-dk),rgba(180,120,0,0.25));flex-shrink:0}
+
+/* Animated path connector (lineage highlight) */
+.v-conn.path-conn{background:linear-gradient(180deg,#FFD700,#FFA500);
+  width:2.5px;box-shadow:0 0 6px rgba(255,215,0,0.7);
+  animation:path-flow 1.2s linear infinite}
+@keyframes path-flow{
+  0%{background:linear-gradient(180deg,#FFD700 0%,#FFA500 50%,#FFD700 100%)}
+  100%{background:linear-gradient(180deg,#FFA500 0%,#FFD700 50%,#FFA500 100%)}}
+
+.tog{width:15px;height:15px;border-radius:50%;
+  background:radial-gradient(circle,var(--cream) 60%,var(--cream-dk) 100%);
+  border:1px solid var(--gold-dk);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:8px;color:var(--maroon);font-weight:700;flex-shrink:0;
+  margin:1px 0;transition:all .18s;box-shadow:0 1px 4px rgba(180,100,0,0.22);
+  font-family:monospace;line-height:1;user-select:none;
+  min-width:15px;min-height:15px;touch-action:manipulation}
+.tog:hover,.tog:active{background:radial-gradient(circle,var(--saffron-lt) 60%,var(--saffron) 100%);
+  border-color:var(--saffron);box-shadow:0 0 8px rgba(255,153,51,0.45)}
+
 .ch-area{display:flex;flex-direction:column;align-items:center}
 .ch-row{display:flex;align-items:flex-start;position:relative}
-.ch-col{display:flex;flex-direction:column;align-items:center;padding:0 5px;animation:slide-in 0.28s ease both}
-@keyframes slide-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.ch-col{display:flex;flex-direction:column;align-items:center;padding:0 5px;
+  animation:slide-in 0.3s ease both}
+@keyframes slide-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;z-index:999;background:rgba(10,2,0,0.82);display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
-.modal{background:linear-gradient(160deg,#2C1200 0%,#1A0800 100%);border:1px solid rgba(212,175,55,0.4);border-radius:12px;padding:2rem;width:100%;max-width:420px;box-shadow:0 0 0 1px rgba(255,153,51,0.1),0 24px 60px rgba(0,0,0,0.6);position:relative;overflow:hidden}
-.modal::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 0% 0%,rgba(212,175,55,0.08) 0%,transparent 60%),radial-gradient(circle at 100% 100%,rgba(255,153,51,0.06) 0%,transparent 50%);pointer-events:none}
-.modal h2{font-family:'Cinzel',serif;font-size:1.2rem;color:var(--gold-lt);margin-bottom:0.4rem;letter-spacing:0.05em}
-.modal p{font-size:0.8rem;color:rgba(255,220,150,0.65);margin-bottom:1.3rem;line-height:1.6}
-.fgrp{margin-bottom:0.9rem}
-.fgrp label{display:block;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.12em;color:var(--saffron-lt);margin-bottom:0.3rem;text-transform:uppercase}
-.fgrp input,.fgrp select{width:100%;padding:0.5rem 0.8rem;background:rgba(0,0,0,0.4);border:1px solid rgba(212,175,55,0.35);border-radius:6px;color:var(--cream);font-family:'Crimson Pro',serif;font-size:0.88rem;outline:none;transition:border-color .18s,box-shadow .18s}
-.fgrp input:focus,.fgrp select:focus{border-color:var(--saffron);box-shadow:0 0 10px rgba(255,153,51,0.2)}
+/* Horizontal connector bar */
+.h-bar-connector{position:absolute;top:0;height:1.5px;
+  background:linear-gradient(90deg,transparent,var(--gold-dk),var(--gold-dk),transparent);
+  pointer-events:none}
+.h-bar-connector.path-h{background:linear-gradient(90deg,transparent,#FFD700,#FFD700,transparent);
+  height:2.5px;box-shadow:0 0 6px rgba(255,215,0,0.7);animation:path-flow-h 1.2s linear infinite}
+@keyframes path-flow-h{
+  0%{background:linear-gradient(90deg,transparent,#FFD700,#FFA500,transparent)}
+  100%{background:linear-gradient(90deg,transparent,#FFA500,#FFD700,transparent)}}
+
+/* ================================================================
+   MODAL
+================================================================ */
+.modal-overlay{position:fixed;inset:0;z-index:999;background:rgba(10,2,0,0.82);
+  display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
+.modal{background:linear-gradient(160deg,#2C1200 0%,#1A0800 100%);
+  border:1px solid rgba(212,175,55,0.4);border-radius:12px;padding:1.8rem;
+  width:100%;max-width:420px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 0 0 1px rgba(255,153,51,0.1),0 24px 60px rgba(0,0,0,0.6);
+  position:relative;overflow:hidden}
+.modal::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 0% 0%,rgba(212,175,55,0.07) 0%,transparent 60%),
+  radial-gradient(circle at 100% 100%,rgba(255,153,51,0.05) 0%,transparent 50%);pointer-events:none}
+.modal h2{font-family:'Cinzel',serif;font-size:1.2rem;color:var(--gold-lt);
+  margin-bottom:0.35rem;letter-spacing:0.05em}
+.modal p{font-size:0.79rem;color:rgba(255,220,150,0.62);margin-bottom:1.2rem;line-height:1.6}
+.fgrp{margin-bottom:0.85rem}
+.fgrp label{display:block;font-family:'Cinzel',serif;font-size:0.6rem;
+  letter-spacing:0.1em;color:var(--saffron-lt);margin-bottom:0.28rem;text-transform:uppercase}
+.fgrp input,.fgrp select{width:100%;padding:0.48rem 0.78rem;background:rgba(0,0,0,0.4);
+  border:1px solid rgba(212,175,55,0.33);border-radius:6px;color:var(--cream);
+  font-family:'Crimson Pro',serif;font-size:0.86rem;outline:none;
+  transition:border-color .18s,box-shadow .18s}
+.fgrp input:focus,.fgrp select:focus{border-color:var(--saffron);
+  box-shadow:0 0 10px rgba(255,153,51,0.2)}
 .fgrp select option{background:#2C1200}
-.modal-err{font-size:0.74rem;color:#ffaaaa;margin-top:0.4rem;min-height:1.1em}
-.modal-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.3),transparent);margin:1rem 0}
-.modal-footer{display:flex;gap:0.7rem;justify-content:flex-end;margin-top:1.2rem}
+.modal-err{font-size:0.73rem;color:#ffaaaa;margin-top:0.35rem;min-height:1.1em}
+.modal-divider{width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,0.3),transparent);margin:0.9rem 0}
+.modal-footer{display:flex;gap:0.6rem;justify-content:flex-end;margin-top:1rem}
 
-/* TIMELINE */
-.timeline-wrap{position:fixed;bottom:0;left:0;right:0;z-index:50;height:40px;
+/* ================================================================
+   TIMELINE (bottom marquee)
+================================================================ */
+.timeline-wrap{position:fixed;bottom:0;left:0;right:0;z-index:50;height:38px;
   background:linear-gradient(90deg,var(--maroon-dk) 0%,#3D0010 30%,#3D0010 70%,var(--maroon-dk) 100%);
-  border-top:1px solid rgba(212,175,55,0.35);overflow:hidden;display:flex;align-items:center}
-.timeline-wrap::before,.timeline-wrap::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2}
+  border-top:1px solid rgba(212,175,55,0.32);overflow:hidden;display:flex;align-items:center}
+.timeline-wrap::before,.timeline-wrap::after{content:'';position:absolute;top:0;bottom:0;width:70px;z-index:2}
 .timeline-wrap::before{left:0;background:linear-gradient(90deg,#200008,transparent)}
 .timeline-wrap::after{right:0;background:linear-gradient(270deg,#200008,transparent)}
-.timeline-track{display:flex;align-items:center;white-space:nowrap;animation:scroll-rtl 32s linear infinite;will-change:transform}
+.timeline-track{display:flex;align-items:center;white-space:nowrap;
+  animation:scroll-rtl 34s linear infinite;will-change:transform}
 .timeline-track:hover{animation-play-state:paused}
 @keyframes scroll-rtl{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.timeline-seg{display:inline-flex;align-items:center;gap:16px;padding:0 36px}
-.timeline-gem{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px rgba(212,175,55,0.6);flex-shrink:0}
-.timeline-text{font-family:'Crimson Pro',serif;font-size:0.8rem;font-style:italic;color:rgba(253,240,180,0.85);letter-spacing:0.04em}
+.timeline-seg{display:inline-flex;align-items:center;gap:14px;padding:0 32px}
+.timeline-gem{display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 6px rgba(212,175,55,0.6);flex-shrink:0}
+.timeline-text{font-family:'Crimson Pro',serif;font-size:0.78rem;font-style:italic;
+  color:rgba(253,240,180,0.82);letter-spacing:0.03em}
 .timeline-text b{font-style:normal;font-weight:600;color:var(--gold-lt)}
-body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif;font-style:normal;font-size:0.78rem}
+body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif;font-style:normal;font-size:0.76rem}
 
-/* ZOOM */
-.zoom-indicator{position:fixed;bottom:50px;right:10px;z-index:40;display:flex;flex-direction:column;gap:4px;align-items:center}
-.zoom-btn{width:26px;height:26px;border-radius:50%;background:rgba(40,15,0,0.85);border:1px solid rgba(212,175,55,0.35);color:var(--gold-lt);font-size:1rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;backdrop-filter:blur(4px);font-family:monospace}
-.zoom-btn:hover{background:rgba(212,175,55,0.2);border-color:var(--gold);box-shadow:0 0 10px rgba(212,175,55,0.3)}
-.zoom-label{font-family:'Cinzel',serif;font-size:0.56rem;color:rgba(212,175,55,0.55);letter-spacing:0.08em}
+/* ================================================================
+   ZOOM CONTROLS
+================================================================ */
+.zoom-indicator{position:fixed;bottom:46px;right:10px;z-index:40;
+  display:flex;flex-direction:column;gap:4px;align-items:center}
+.zoom-btn{width:28px;height:28px;border-radius:50%;
+  background:rgba(40,15,0,0.85);border:1px solid rgba(212,175,55,0.35);
+  color:var(--gold-lt);font-size:1rem;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+  backdrop-filter:blur(4px);font-family:monospace;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.zoom-btn:hover,.zoom-btn:active{background:rgba(212,175,55,0.2);border-color:var(--gold);
+  box-shadow:0 0 10px rgba(212,175,55,0.3)}
+.zoom-label{font-family:'Cinzel',serif;font-size:0.55rem;
+  color:rgba(212,175,55,0.5);letter-spacing:0.07em}
 
-/* LEGEND */
-.legend{position:fixed;bottom:50px;left:10px;z-index:40;display:flex;flex-direction:column;gap:5px;background:rgba(20,5,0,0.78);border:1px solid rgba(212,175,55,0.2);border-radius:8px;padding:0.45rem 0.75rem;backdrop-filter:blur(4px)}
-.leg-item{display:flex;align-items:center;gap:6px;font-size:0.62rem;color:rgba(253,240,180,0.6);font-family:'Noto Serif',serif}
+/* ================================================================
+   LEGEND
+================================================================ */
+.legend{position:fixed;bottom:46px;left:10px;z-index:40;display:flex;flex-direction:column;
+  gap:5px;background:rgba(20,5,0,0.78);border:1px solid rgba(212,175,55,0.18);
+  border-radius:8px;padding:0.42rem 0.72rem;backdrop-filter:blur(4px)}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:0.61rem;
+  color:rgba(253,240,180,0.58);font-family:'Noto Serif',serif}
 .leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* ================================================================
+   MOBILE RESPONSIVE
+================================================================ */
+@media(max-width:600px){
+  .header h1{font-size:1.3rem}
+  .toolbar{gap:0.3rem;padding:0.4rem 0.5rem}
+  .btn{font-size:0.6rem;padding:0.35rem 0.65rem;min-height:34px}
+  .lang-opt{padding:0.3rem 0.6rem;font-size:0.62rem}
+  .tree-viewport{height:calc(100vh - 280px)}
+  .node-box{min-width:72px;max-width:100px;padding:0.28rem 0.45rem 0.24rem}
+  .node-name{font-size:0.65rem}
+  .node-rel{font-size:0.48rem}
+  .legend{display:none}
+  .last-updated{font-size:0.58rem}
+  .search-box{max-width:100%}
+}
+@media(max-width:380px){
+  .btn{font-size:0.56rem;padding:0.3rem 0.55rem}
+  .node-box{min-width:62px;max-width:88px}
+  .node-name{font-size:0.6rem}
+}
 </style>
 </head>
 <body>
 
-<!-- Corner decorations -->
-<svg class="corner-decor tl" viewBox="0 0 120 120" fill="none"><path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/><path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/><circle cx="15" cy="15" r="6" stroke="#D4AF37" stroke-width="1" fill="none"/><circle cx="15" cy="15" r="3" fill="#D4AF37" fill-opacity="0.4"/><path d="M15 5 L17 9 L22 9 L18 12 L20 17 L15 14 L10 17 L12 12 L8 9 L13 9 Z" fill="#D4AF37" fill-opacity="0.5"/></svg>
-<svg class="corner-decor tr" viewBox="0 0 120 120" fill="none"><path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/><path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/><circle cx="15" cy="15" r="6" stroke="#D4AF37" stroke-width="1" fill="none"/><circle cx="15" cy="15" r="3" fill="#D4AF37" fill-opacity="0.4"/></svg>
-<svg class="corner-decor bl" viewBox="0 0 120 120" fill="none"><path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/><path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/></svg>
-<svg class="corner-decor br" viewBox="0 0 120 120" fill="none"><path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/><path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/></svg>
+<!-- ── SVG RANGOLI BACKGROUND ── -->
+<svg class="rangoli-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="rangoli-pat" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <circle cx="50" cy="50" r="2" fill="#D4AF37"/>
+      <circle cx="0" cy="0" r="1.5" fill="#FF9933"/>
+      <circle cx="100" cy="0" r="1.5" fill="#FF9933"/>
+      <circle cx="0" cy="100" r="1.5" fill="#FF9933"/>
+      <circle cx="100" cy="100" r="1.5" fill="#FF9933"/>
+      <circle cx="50" cy="0" r="1" fill="#D4AF37"/>
+      <circle cx="50" cy="100" r="1" fill="#D4AF37"/>
+      <circle cx="0" cy="50" r="1" fill="#D4AF37"/>
+      <circle cx="100" cy="50" r="1" fill="#D4AF37"/>
+      <line x1="48" y1="50" x2="52" y2="50" stroke="#D4AF37" stroke-width="0.5"/>
+      <line x1="50" y1="48" x2="50" y2="52" stroke="#D4AF37" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#rangoli-pat)"/>
+</svg>
 
 <div class="bg-layer"></div>
 
+<!-- Corner decorations -->
+<svg class="corner-decor tl" viewBox="0 0 120 120" fill="none">
+  <path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+  <path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/>
+  <circle cx="15" cy="15" r="6" stroke="#D4AF37" stroke-width="1" fill="none"/>
+  <circle cx="15" cy="15" r="3" fill="#D4AF37" fill-opacity="0.4"/>
+  <path d="M15 5 L17 9 L22 9 L18 12 L20 17 L15 14 L10 17 L12 12 L8 9 L13 9 Z" fill="#D4AF37" fill-opacity="0.5"/>
+</svg>
+<svg class="corner-decor tr" viewBox="0 0 120 120" fill="none">
+  <path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+  <path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/>
+  <circle cx="15" cy="15" r="6" stroke="#D4AF37" stroke-width="1" fill="none"/>
+  <circle cx="15" cy="15" r="3" fill="#D4AF37" fill-opacity="0.4"/>
+  <path d="M15 5 L17 9 L22 9 L18 12 L20 17 L15 14 L10 17 L12 12 L8 9 L13 9 Z" fill="#D4AF37" fill-opacity="0.5"/>
+</svg>
+<svg class="corner-decor bl" viewBox="0 0 120 120" fill="none">
+  <path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+  <path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/>
+  <circle cx="15" cy="15" r="6" stroke="#D4AF37" stroke-width="1" fill="none"/>
+</svg>
+<svg class="corner-decor br" viewBox="0 0 120 120" fill="none">
+  <path d="M0 120 Q30 90 60 60 Q90 30 120 0" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+  <path d="M0 80 Q20 60 40 40 Q60 20 80 0" stroke="#FF9933" stroke-width="1" fill="none"/>
+  <circle cx="15" cy="15" r="6" stroke="#D4AF37" stroke-width="1" fill="none"/>
+</svg>
+
+<!-- ── APP SHELL ── -->
 <div style="position:relative;z-index:5;display:flex;flex-direction:column;min-height:100vh">
 
+  <!-- HEADER -->
   <header class="header">
     <div class="header-ornament">
       <div class="ornament-line"></div>
-      <span style="font-size:1rem;color:var(--saffron)">✦</span>
+      <span style="font-size:0.95rem;color:var(--saffron)">✦</span>
       <div class="ornament-line"></div>
     </div>
     <h1 id="main-title">Thota Family Tree</h1>
-    <div class="header-sub" id="main-sub">Thota Vamsham &nbsp;·&nbsp; Six Generations · All Branches</div>
+    <div class="header-sub" id="main-sub">Thota Vamsham · Six Generations · All Branches</div>
+    <div class="last-updated" id="last-updated"></div>
   </header>
 
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <div class="search-box" id="search-box-wrap">
+      <input type="text" id="search-input" placeholder="Search by name…" autocomplete="off" spellcheck="false"/>
+      <button class="search-clear" id="search-clear" title="Clear">✕</button>
+      <div class="search-suggestions" id="search-suggestions" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
   <div class="toolbar" id="toolbar"></div>
   <div class="you-bar" id="you-bar"></div>
-  <div class="hint-bar" id="hint-bar">Drag to pan &nbsp;·&nbsp; Scroll / pinch to zoom &nbsp;·&nbsp; +/− to expand / collapse</div>
+  <div class="hint-bar" id="hint-bar">Drag to pan · Scroll / pinch to zoom · +/− to expand / collapse</div>
 
+  <!-- TREE VIEWPORT -->
   <div class="tree-viewport" id="tree-viewport">
     <div class="tree-canvas" id="tree-canvas"></div>
   </div>
 
+  <!-- LEGEND -->
   <div class="legend">
     <div class="leg-item"><div class="leg-dot" style="background:var(--saffron);box-shadow:0 0 5px rgba(255,153,51,.6)"></div><span id="leg1">You (glowing)</span></div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div><span id="leg2">Relationship via BFS+LCA</span></div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--node-border)"></div><span id="leg3">Family node</span></div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div><span id="leg2">Lineage path</span></div>
+    <div class="leg-item"><div class="leg-dot" style="background:#FFD700;box-shadow:0 0 4px rgba(255,215,0,.5)"></div><span id="leg3">Search hit</span></div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--node-border)"></div><span id="leg4">Family node</span></div>
   </div>
 
+  <!-- ZOOM CONTROLS -->
   <div class="zoom-indicator">
-    <button class="zoom-btn" id="zoom-in">+</button>
+    <button class="zoom-btn" id="zoom-in" aria-label="Zoom in">+</button>
     <div class="zoom-label" id="zoom-label">85%</div>
-    <button class="zoom-btn" id="zoom-out">−</button>
-    <button class="zoom-btn" id="zoom-reset" style="font-size:.6rem">FIT</button>
+    <button class="zoom-btn" id="zoom-out" aria-label="Zoom out">−</button>
+    <button class="zoom-btn" id="zoom-reset" style="font-size:.58rem" aria-label="Fit">FIT</button>
   </div>
 
+  <!-- MODAL -->
   <div id="modal-root"></div>
 
+  <!-- TIMELINE -->
   <div class="timeline-wrap">
     <div class="timeline-track" id="timeline-track"></div>
   </div>
@@ -225,136 +483,87 @@ body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif;font-style:nor
 </div>
 
 <script>
-/* ============================================================
-   LANGUAGE SYSTEM
-   All UI strings and all relationship labels in EN + TE
-============================================================ */
-let lang = 'en'; // 'en' or 'te'
+/* ================================================================
+   MODULE: LANGUAGE / TRANSLATIONS
+================================================================ */
+let lang = 'en';
 
 const T = {
   en: {
-    title:          'Thota Family Tree',
-    sub:            'Thota Vamsham · Six Generations · All Branches',
-    btnRelation:    '✦ Know Your Relationship',
-    btnExpand:      'Expand All',
-    btnCollapse:    'Collapse All',
-    btnClear:       '✕ Clear',
-    btnLangEn:      'EN',
-    btnLangTe:      'తె',
-    hint:           'Drag to pan · Scroll / pinch to zoom · +/− to expand / collapse',
-    youBarPrefix:   'Showing relationships relative to:',
-    youBarSuffix:   '· Computed via BFS + Lowest Common Ancestor',
-    leg1:           'You (glowing)',
-    leg2:           'Relationship via BFS+LCA',
-    leg3:           'Family node',
-    modalTitle:     'Know Your Relationship',
-    modalDesc:      'Type your name as it appears in the tree. If the same name appears in multiple branches, also choose your father to pinpoint you exactly.',
-    labelName:      'Your Name',
-    placeholderName:'e.g. Kumar, Srinu, Veeraiah, Venkatesh…',
-    labelFather:    'Your Father',
-    labelFatherHint:'(optional — resolves duplicates)',
-    fatherDefault:  '— Select your father —',
-    btnCancel:      'Cancel',
-    btnFind:        'Find Me in Tree ✦',
-    errNoName:      'Please enter your name.',
-    errNotFound:    'Name not found. Check spelling or pick your father above.',
-    errMultiple:    'Multiple matches found. Please select your father to narrow it down.',
-    timeline:       'Thota Family Tree structure created by <b>Venkatesh Thota</b>, S/o <b>Sambaiah Thota</b> &nbsp;✦&nbsp; Thota Vamsham · Six Generations · All Branches Complete',
-    // Relationships
-    You:            'You',
-    Spouse:         'Spouse',
-    Father:         'Father',
-    Mother:         'Mother',
-    Son:            'Son',
-    Daughter:       'Daughter',
-    Grandson:       'Grandson',
-    Granddaughter:  'Granddaughter',
-    Grandfather:    'Grandfather',
-    Grandmother:    'Grandmother',
-    Brother:        'Brother',
-    Sister:         'Sister',
-    Uncle:          'Uncle',
-    Aunt:           'Aunt',
-    Nephew:         'Nephew',
-    Niece:          'Niece',
-    GrandUncle:     'Grand-Uncle',
-    GrandAunt:      'Grand-Aunt',
-    GrandNephew:    'Grand-Nephew',
-    GrandNiece:     'Grand-Niece',
-    Cousin:         'Cousin',
-    FatherInLaw:    'Father-in-law',
-    MotherInLaw:    'Mother-in-law',
-    SonInLaw:       'Son-in-law',
-    DaughterInLaw:  'Daughter-in-law',
-    BrotherInLaw:   'Brother-in-law',
-    SisterInLaw:    'Sister-in-law',
-    UncleMarriage:  'Uncle (by marriage)',
-    AuntMarriage:   'Aunt (by marriage)',
-    CousinSpouse:   "Cousin's Spouse",
-    GranddaughterInLaw: 'Granddaughter-in-law',
-    GrandsonInLaw:  'Grandson-in-law',
+    title:'Thota Family Tree', sub:'Thota Vamsham · Six Generations · All Branches',
+    btnRelation:'✦ Know Your Relationship', btnExpand:'Expand All',
+    btnCollapse:'Collapse All', btnClear:'✕ Clear',
+    hint:'Drag to pan · Scroll/pinch to zoom · +/− expand/collapse',
+    youBarPre:'Showing relationships relative to:', youBarSuf:'· via BFS + LCA',
+    leg1:'You (glowing)', leg2:'Lineage path', leg3:'Search hit', leg4:'Family node',
+    lastUpdated:'Data last updated:',
+    searchPlaceholder:'Search by name…',
+    modalTitle:'Know Your Relationship',
+    modalDesc:'Type your name as it appears in the tree. If the same name appears in multiple branches, also select your father.',
+    labelName:'Your Name', placeholderName:'e.g. Kumar, Srinu, Venkatesh…',
+    labelFather:'Your Father', labelFatherHint:'(optional — resolves duplicates)',
+    fatherDefault:'— Select your father —',
+    btnCancel:'Cancel', btnFind:'Find Me in Tree ✦',
+    errNoName:'Please enter your name.',
+    errNotFound:'Name not found. Check spelling or pick your father.',
+    errMultiple:'Multiple matches. Please select your father.',
+    timeline:'Thota Family Tree created by <b>Venkatesh Thota</b>, S/o <b>Sambaiah Thota</b> &nbsp;✦&nbsp; Thota Vamsham · Six Generations · All Branches Complete',
+    // Relationship keys → display labels (English)
+    You:'You', Spouse:'Spouse',
+    Father:'Father', Mother:'Mother',
+    Son:'Son', Daughter:'Daughter',
+    Grandson:'Grandson', Granddaughter:'Granddaughter',
+    Grandfather:'Grandfather', Grandmother:'Grandmother',
+    Brother:'Brother', Sister:'Sister',
+    Uncle:'Uncle', Aunt:'Aunt',
+    Nephew:'Nephew', Niece:'Niece',
+    GrandUncle:'Grand-Uncle', GrandAunt:'Grand-Aunt',
+    GrandNephew:'Grand-Nephew', GrandNiece:'Grand-Niece',
+    Cousin:'Cousin',
+    FatherInLaw:'Father-in-law', MotherInLaw:'Mother-in-law',
+    SonInLaw:'Son-in-law', DaughterInLaw:'Daughter-in-law',
+    BrotherInLaw:'Brother-in-law', SisterInLaw:'Sister-in-law',
+    UncleMarriage:'Uncle (by marriage)', AuntMarriage:'Aunt (by marriage)',
+    CousinSpouse:"Cousin's Spouse",
+    GranddaughterInLaw:'Granddaughter-in-law', GrandsonInLaw:'Grandson-in-law',
   },
   te: {
-    title:          'థోటా వంశ వృక్షం',
-    sub:            'థోటా వంశం · ఆరు తరాలు · అన్ని శాఖలు',
-    btnRelation:    '✦ మీ బంధం తెలుసుకోండి',
-    btnExpand:      'అన్నీ విప్పండి',
-    btnCollapse:    'అన్నీ మూయండి',
-    btnClear:       '✕ తీసివేయి',
-    btnLangEn:      'EN',
-    btnLangTe:      'తె',
-    hint:           'లాగడానికి డ్రాగ్ చేయండి · జూమ్ చేయడానికి స్క్రోల్ చేయండి · +/− శాఖలు తెరవండి/మూయండి',
-    youBarPrefix:   'బంధాలు చూపుతున్నారు:',
-    youBarSuffix:   '· BFS + LCA ద్వారా లెక్కించారు',
-    leg1:           'మీరు (మెరుపు)',
-    leg2:           'BFS+LCA ద్వారా బంధం',
-    leg3:           'కుటుంబ సభ్యుడు',
-    modalTitle:     'మీ బంధం తెలుసుకోండి',
-    modalDesc:      'చెట్టులో కనిపించే విధంగా మీ పేరు టైప్ చేయండి. ఒకే పేరు అనేక చోట్ల ఉంటే, మీ నాన్న పేరు కూడా ఎంచుకోండి.',
-    labelName:      'మీ పేరు',
-    placeholderName:'ఉదా: కుమార్, శ్రీను, వీరయ్య…',
-    labelFather:    'మీ తండ్రి',
-    labelFatherHint:'(ఐచ్ఛికం — నకళ్ళు తగ్గిస్తుంది)',
-    fatherDefault:  '— మీ తండ్రిని ఎంచుకోండి —',
-    btnCancel:      'రద్దు చేయి',
-    btnFind:        'చెట్టులో నన్ను కనుగొనండి ✦',
-    errNoName:      'దయచేసి మీ పేరు నమోదు చేయండి.',
-    errNotFound:    'పేరు కనుగొనబడలేదు. స్పెల్లింగ్ తనిఖీ చేయండి.',
-    errMultiple:    'అనేక మ్యాచ్‌లు కనుగొనబడ్డాయి. మీ తండ్రిని ఎంచుకోండి.',
-    timeline:       'థోటా వంశ వృక్షం నిర్మించారు <b>వెంకటేశ్ థోటా</b>, తండ్రి <b>సంబయ్య థోటా</b> &nbsp;✦&nbsp; థోటా వంశం · ఆరు తరాలు · పూర్తి వంశ వృక్షం',
-    // Relationships — Telugu family terms
-    You:            'మీరు',
-    Spouse:         'భార్య/భర్త',
-    Father:         'నాన్న',
-    Mother:         'అమ్మ',
-    Son:            'కొడుకు',
-    Daughter:       'కూతురు',
-    Grandson:       'మనవడు',
-    Granddaughter:  'మనవరాలు',
-    Grandfather:    'తాత',
-    Grandmother:    'నానమ్మ',
-    Brother:        'అన్న/తమ్ముడు',
-    Sister:         'అక్క/చెల్లెలు',
-    Uncle:          'మామయ్య/పెదనాన్న',
-    Aunt:           'అత్తయ్య/పెద్దమ్మ',
-    Nephew:         'మేనల్లుడు',
-    Niece:          'మేనకోడలు',
-    GrandUncle:     'పెద్ద మామయ్య',
-    GrandAunt:      'పెద్ద అత్తయ్య',
-    GrandNephew:    'మనవ అల్లుడు',
-    GrandNiece:     'మనవ కోడలు',
-    Cousin:         'బావ/మరది/అత్తకొడుకు',
-    FatherInLaw:    'మావగారు',
-    MotherInLaw:    'అత్తగారు',
-    SonInLaw:       'అల్లుడు',
-    DaughterInLaw:  'కోడలు',
-    BrotherInLaw:   'బావమరిది',
-    SisterInLaw:    'వదిన/మరదలు',
-    UncleMarriage:  'మామయ్య (వివాహం ద్వారా)',
-    AuntMarriage:   'అత్తయ్య (వివాహం ద్వారా)',
-    CousinSpouse:   'మేనల్లుడి భార్య/భర్త',
-    GranddaughterInLaw: 'మనవ కోడలు',
-    GrandsonInLaw:  'మనవ అల్లుడు',
+    title:'థోటా వంశ వృక్షం', sub:'థోటా వంశం · ఆరు తరాలు · అన్ని శాఖలు',
+    btnRelation:'✦ మీ బంధం తెలుసుకోండి', btnExpand:'అన్నీ విప్పండి',
+    btnCollapse:'అన్నీ మూయండి', btnClear:'✕ తీసివేయి',
+    hint:'లాగడానికి డ్రాగ్ చేయండి · జూమ్ కు స్క్రోల్ చేయండి · +/− శాఖలు తెరవండి',
+    youBarPre:'బంధాలు చూపుతున్నారు:', youBarSuf:'· BFS + LCA ద్వారా',
+    leg1:'మీరు (మెరుపు)', leg2:'వంశ మార్గం', leg3:'వెతుకు ఫలితం', leg4:'కుటుంబ సభ్యుడు',
+    lastUpdated:'డేటా చివరిగా నవీకరించబడింది:',
+    searchPlaceholder:'పేరు వెతకండి…',
+    modalTitle:'మీ బంధం తెలుసుకోండి',
+    modalDesc:'చెట్టులో కనిపించే విధంగా మీ పేరు టైప్ చేయండి. ఒకే పేరు అనేక చోట్ల ఉంటే, మీ నాన్న పేరు కూడా ఎంచుకోండి.',
+    labelName:'మీ పేరు', placeholderName:'ఉదా: కుమార్, శ్రీను, వెంకటేశ్…',
+    labelFather:'మీ తండ్రి', labelFatherHint:'(ఐచ్ఛికం — నకళ్ళు తగ్గిస్తుంది)',
+    fatherDefault:'— మీ తండ్రిని ఎంచుకోండి —',
+    btnCancel:'రద్దు చేయి', btnFind:'చెట్టులో నన్ను కనుగొనండి ✦',
+    errNoName:'దయచేసి మీ పేరు నమోదు చేయండి.',
+    errNotFound:'పేరు కనుగొనబడలేదు. స్పెల్లింగ్ తనిఖీ చేయండి.',
+    errMultiple:'అనేక మ్యాచ్‌లు కనుగొనబడ్డాయి. మీ తండ్రిని ఎంచుకోండి.',
+    timeline:'థోటా వంశ వృక్షం నిర్మించారు <b>వెంకటేశ్ థోటా</b>, తండ్రి <b>సంబయ్య థోటా</b> &nbsp;✦&nbsp; థోటా వంశం · ఆరు తరాలు · పూర్తి వంశ వృక్షం',
+    // Telugu relationship labels
+    You:'మీరు', Spouse:'భార్య/భర్త',
+    Father:'నాన్న', Mother:'అమ్మ',
+    Son:'కుమారుడు', Daughter:'కుమార్తె',
+    Grandson:'మనవడు', Granddaughter:'మనవరాలు',
+    Grandfather:'తాత', Grandmother:'నానమ్మ',
+    Brother:'అన్న/తమ్ముడు', Sister:'అక్క/చెల్లెలు',
+    Uncle:'మామయ్య', Aunt:'అత్తయ్య',
+    Nephew:'మేనల్లుడు', Niece:'మేనకోడలు',
+    GrandUncle:'పెద్ద మామయ్య', GrandAunt:'పెద్ద అత్తయ్య',
+    GrandNephew:'మనవ అల్లుడు', GrandNiece:'మనవ కోడలు',
+    Cousin:'బావ/మరది',
+    FatherInLaw:'మావగారు', MotherInLaw:'అత్తగారు',
+    SonInLaw:'అల్లుడు', DaughterInLaw:'కోడలు',
+    BrotherInLaw:'బావమరిది', SisterInLaw:'వదిన/మరదలు',
+    UncleMarriage:'మామయ్య (వివాహం ద్వారా)', AuntMarriage:'అత్తయ్య (వివాహం ద్వారా)',
+    CousinSpouse:'బంధువు జీవిత భాగస్వామి',
+    GranddaughterInLaw:'మనవ కోడలు', GrandsonInLaw:'మనవ అల్లుడు',
   }
 };
 
@@ -362,34 +571,40 @@ function t(key){ return T[lang][key] || T.en[key] || key; }
 
 function setLang(l){
   lang = l;
-  document.body.classList.toggle('lang-te', l==='te');
+  document.body.classList.toggle('lang-te', l === 'te');
   applyUIStrings();
   if(youId) relMap = buildRelMap(youId);
-  renderToolbar();
-  renderYouBar();
-  renderTree();
-  buildTimeline();
+  renderToolbar(); renderYouBar(); renderTree(); buildTimeline();
 }
 
 function applyUIStrings(){
-  const el = id => document.getElementById(id);
-  if(el('main-title')) el('main-title').textContent = t('title');
-  if(el('main-sub'))   el('main-sub').textContent   = t('sub');
-  if(el('hint-bar'))   el('hint-bar').textContent   = t('hint');
-  if(el('leg1'))       el('leg1').textContent        = t('leg1');
-  if(el('leg2'))       el('leg2').textContent        = t('leg2');
-  if(el('leg3'))       el('leg3').textContent        = t('leg3');
+  const set = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('main-title', t('title')); set('main-sub', t('sub')); set('hint-bar', t('hint'));
+  set('leg1', t('leg1')); set('leg2', t('leg2')); set('leg3', t('leg3')); set('leg4', t('leg4'));
+  const si = document.getElementById('search-input');
+  if(si) si.placeholder = t('searchPlaceholder');
+  setLastUpdated();
 }
 
-/* ============================================================
-   FAMILY DATA
-============================================================ */
+function setLastUpdated(){
+  const el = document.getElementById('last-updated');
+  if(!el) return;
+  const d = new Date();
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  el.textContent = `${t('lastUpdated')} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/* ================================================================
+   MODULE: FAMILY DATA
+================================================================ */
 let _uid = 1;
-const G = {};
+const G = {}; // id → person node
+
 function mkId(){ return 'N'+(++_uid); }
+
 function person(name, gender){
   const id = mkId();
-  G[id] = { id, name, gender: gender||'m', fatherId:null, motherId:null, spouseId:null, childrenIds:[] };
+  G[id] = { id, name, gender:gender||'m', fatherId:null, motherId:null, spouseId:null, childrenIds:[] };
   return id;
 }
 function marry(aId, bId){
@@ -408,12 +623,12 @@ function addChildren(parentId, spouseId, childIds){
   });
 }
 
-/* ROOT */
+/* ── ROOT ── */
 const P_Veraiah      = person('Veraiah','m');
 const P_Laxminasamma = person('Laxminasamma','f');
 marry(P_Veraiah, P_Laxminasamma);
 
-/* ── KANAKAIAH ── */
+/* ── KANAKAIAH branch ── */
 const P_Kanakaiah = person('Kanakaiah','m');
 const P_Laxmi_K   = person('Laxmi','f');
 marry(P_Kanakaiah, P_Laxmi_K);
@@ -434,8 +649,8 @@ marry(P_Kanakaiah, P_Laxmi_K);
       const P_Pranay = person('Pranay','m');
     addChildren(P_Kumar, P_Swarupa, [P_Pravalika, P_Pranay]);
 
-    const P_Srinu_V  = person('Srinu','m');
-    const P_Radhika  = person('Radhika','f');
+    const P_Srinu_V = person('Srinu','m');
+    const P_Radhika = person('Radhika','f');
     marry(P_Srinu_V, P_Radhika);
       const P_Vickey   = person('Vickey','m');
       const P_Pranatha = person('Pranatha','f');
@@ -516,7 +731,7 @@ marry(P_Kanakaiah, P_Laxmi_K);
 
 addChildren(P_Kanakaiah, P_Laxmi_K, [P_Veeraiah, P_Mallaiah, P_Komuraiah]);
 
-/* ── VERAMALLU ── */
+/* ── VERAMALLU branch ── */
 const P_Veramallu = person('Veramallu','m');
 const P_Samakka   = person('Samakka','f');
 marry(P_Veramallu, P_Samakka);
@@ -570,8 +785,8 @@ marry(P_Veramallu, P_Samakka);
     addChildren(P_Gauthami, P_Govardhan, [P_KenishaYuga]);
   addChildren(P_Laxminarayana, P_Vijaya_L, [P_Vinay_L, P_Gauthami]);
 
-  const P_Komurelli = person('Komurelli','m');
-  const P_Savitha   = person('Savitha','f');
+  const P_Komurelli    = person('Komurelli','m');
+  const P_Savitha      = person('Savitha','f');
   marry(P_Komurelli, P_Savitha);
     const P_SravanKumar   = person('Sravan Kumar','m');
     const P_Bindhusree    = person('Bindhusree','f');
@@ -606,7 +821,7 @@ marry(P_Veramallu, P_Samakka);
 
 addChildren(P_Veramallu, P_Samakka, [P_Veeraswamy, P_Suraiah, P_Laxminarayana, P_Komurelli, P_Alivela, P_Laxmi_VD]);
 
-/* ── NARSAIAH ── */
+/* ── NARSAIAH branch ── */
 const P_Narsaiah = person('Narsaiah','m');
 const P_Yellamma = person('Yellamma','f');
 marry(P_Narsaiah, P_Yellamma);
@@ -648,6 +863,7 @@ marry(P_Narsaiah, P_Yellamma);
       const P_Dharshanik = person('Dharshanik','m');
       const P_Chaitra    = person('Chaitra','f');
     addChildren(P_Sujatha_N, P_Rajesh_N, [P_Dharshanik, P_Chaitra]);
+    /* SPELLING FIX: Labanya (was "Lavanya" misspelling) */
     const P_Labanya = person('Labanya','f');
     const P_Raju_L  = person('Raju','m');
     marry(P_Labanya, P_Raju_L);
@@ -669,7 +885,7 @@ marry(P_Narsaiah, P_Yellamma);
 
 addChildren(P_Narsaiah, P_Yellamma, [P_Sambaiah, P_Sambalaxmi, P_Vijaya_N, P_Laxmi_ND]);
 
-/* ── BADRAIAH ── */
+/* ── BADRAIAH branch ── */
 const P_Badraiah  = person('Badraiah','m');
 const P_Kamulamma = person('Kamulamma','f');
 marry(P_Badraiah, P_Kamulamma);
@@ -681,7 +897,7 @@ marry(P_Badraiah, P_Kamulamma);
   addChildren(P_Pushpanila, P_Sudhakar, [P_Shivaraj, P_Rakesh_B]);
 addChildren(P_Badraiah, P_Kamulamma, [P_Pushpanila]);
 
-/* ── LAXMIAKKA ── */
+/* ── LAXMIAKKA branch ── */
 const P_Laxmiakka  = person('Laxmiakka','f');
 const P_Ielakka    = person('Ielakka','f');
 const P_Veeralaxmi = person('Veeralaxmi','f');
@@ -691,226 +907,476 @@ addChildren(P_Laxmiakka, null, [P_Ielakka, P_Veeralaxmi]);
 addChildren(P_Veraiah, P_Laxminasamma,
   [P_Kanakaiah, P_Veramallu, P_Narsaiah, P_Badraiah, P_Laxmiakka]);
 
-/* ============================================================
-   RELATIONSHIP ENGINE — BFS + LCA
-============================================================ */
+/* ================================================================
+   MODULE: RELATIONSHIP ENGINE — BFS + LCA
+================================================================ */
+
+/** BFS upward: returns Map<id, depth> for all ancestors */
 function ancestorMap(id){
   const dist = new Map();
-  const q = [[id,0]];
+  const q = [[id, 0]];
   while(q.length){
-    const [cur,d]=q.shift(); if(dist.has(cur)) continue;
-    dist.set(cur,d);
-    const p=G[cur]; if(!p) continue;
-    if(p.fatherId) q.push([p.fatherId,d+1]);
-    if(p.motherId) q.push([p.motherId,d+1]);
+    const [cur, d] = q.shift();
+    if(dist.has(cur)) continue;
+    dist.set(cur, d);
+    const p = G[cur]; if(!p) continue;
+    if(p.fatherId) q.push([p.fatherId, d+1]);
+    if(p.motherId) q.push([p.motherId, d+1]);
   }
   return dist;
 }
-function findLCA(aId,bId){
-  const ancsA=ancestorMap(aId), ancsB=ancestorMap(bId);
-  let best=null;
-  ancsA.forEach((dA,node)=>{
+
+/** Find Lowest Common Ancestor between two IDs */
+function findLCA(aId, bId){
+  const ancsA = ancestorMap(aId);
+  const ancsB = ancestorMap(bId);
+  let best = null;
+  ancsA.forEach((dA, node) => {
     if(ancsB.has(node)){
-      const dB=ancsB.get(node), total=dA+dB;
-      if(!best||total<best.total||(total===best.total&&dA<best.dA)) best={lca:node,dA,dB,total};
+      const dB = ancsB.get(node), total = dA + dB;
+      if(!best || total < best.total || (total === best.total && dA < best.dA))
+        best = { lca: node, dA, dB, total };
     }
   });
   return best;
 }
+
+/** Returns the full ancestor path from id up to ancestorId */
+function getPathToAncestor(id, ancestorId){
+  const path = [id];
+  let cur = id;
+  while(cur !== ancestorId){
+    const p = G[cur];
+    if(!p) break;
+    // Prefer father path, fall back to mother
+    let next = null;
+    if(p.fatherId && G[p.fatherId]){
+      const am = ancestorMap(ancestorId);
+      // Walk whichever parent leads toward ancestorId
+      const viaFather = ancestorMap(p.fatherId).has(ancestorId) || p.fatherId === ancestorId;
+      const viaMother = p.motherId && (ancestorMap(p.motherId).has(ancestorId) || p.motherId === ancestorId);
+      if(viaFather) next = p.fatherId;
+      else if(viaMother) next = p.motherId;
+      else next = p.fatherId;
+    } else if(p.motherId){
+      next = p.motherId;
+    } else break;
+    if(path.includes(next)) break;
+    path.push(next);
+    cur = next;
+  }
+  return path;
+}
+
+/** Build the set of IDs on the lineage path between youId and targetId */
+function buildLinagePath(youId, targetId){
+  const lca = findLCA(youId, targetId);
+  if(!lca) return new Set();
+  const pathA = getPathToAncestor(youId, lca.lca);
+  const pathB = getPathToAncestor(targetId, lca.lca);
+  return new Set([...pathA, ...pathB]);
+}
+
 function ordinal(n){ const s=['th','st','nd','rd'],v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
 
-function computeRel(youId, targetId){
-  if(!youId||!targetId) return null;
-  if(youId===targetId) return 'You';
-  const you=G[youId], tgt=G[targetId];
-  if(!you||!tgt) return null;
-  const f=tgt.gender==='f';
-  if(you.spouseId===targetId) return 'Spouse';
-  const lca=findLCA(youId,targetId);
+/** Compute relationship key (language-neutral) between youId → targetId */
+function computeRelKey(youId, targetId){
+  if(!youId || !targetId) return null;
+  if(youId === targetId) return 'You';
+  const you = G[youId], tgt = G[targetId];
+  if(!you || !tgt) return null;
+  const f = tgt.gender === 'f';
+
+  if(you.spouseId === targetId) return 'Spouse';
+
+  const lca = findLCA(youId, targetId);
+
   if(!lca){
-    const partner=Object.values(G).find(p=>p.spouseId===targetId);
+    // Check in-law via spouse of blood relative
+    const partner = Object.values(G).find(p => p.spouseId === targetId);
     if(partner){
-      const pRel=computeRel(youId,partner.id); if(!pRel) return null;
-      if(pRel==='Father'||pRel==='Mother')         return f?'MotherInLaw':'FatherInLaw';
-      if(pRel==='Son'||pRel==='Daughter')           return f?'DaughterInLaw':'SonInLaw';
-      if(pRel==='Brother'||pRel==='Sister')         return f?'SisterInLaw':'BrotherInLaw';
-      if(pRel==='Uncle'||pRel==='Aunt')             return f?'AuntMarriage':'UncleMarriage';
-      if(pRel&&pRel.includes('Cousin'))             return 'CousinSpouse';
-      if(pRel==='Grandson'||pRel==='Granddaughter') return f?'GranddaughterInLaw':'GrandsonInLaw';
+      const pRel = computeRelKey(youId, partner.id); if(!pRel) return null;
+      if(pRel==='Father'||pRel==='Mother')           return f?'MotherInLaw':'FatherInLaw';
+      if(pRel==='Son'||pRel==='Daughter')             return f?'DaughterInLaw':'SonInLaw';
+      if(pRel==='Brother'||pRel==='Sister')           return f?'SisterInLaw':'BrotherInLaw';
+      if(pRel==='Uncle'||pRel==='Aunt')               return f?'AuntMarriage':'UncleMarriage';
+      if(pRel&&pRel.includes('Cousin'))               return 'CousinSpouse';
+      if(pRel==='Grandson'||pRel==='Granddaughter')   return f?'GranddaughterInLaw':'GrandsonInLaw';
       return null;
     }
     return null;
   }
-  const {dA,dB}=lca;
+
+  const { dA, dB } = lca;
+
   if(dA===0){
     if(dB===1) return f?'Daughter':'Son';
     if(dB===2) return f?'Granddaughter':'Grandson';
     if(dB===3) return f?'GreatGranddaughter':'GreatGrandson';
-    return `${dB-1}xGreatGrand${f?'daughter':'son'}`;
+    return `${dB-1}xGGrand_${f?'d':'s'}`;
   }
   if(dB===0){
     if(dA===1) return f?'Mother':'Father';
     if(dA===2) return f?'Grandmother':'Grandfather';
     if(dA===3) return f?'GreatGrandmother':'GreatGrandfather';
-    return `${dA-1}xGreatGrand${f?'mother':'father'}`;
+    return `${dA-1}xGGrand_${f?'m':'f'}`;
   }
   if(dA===1&&dB===1) return f?'Sister':'Brother';
   if(dA===2&&dB===1) return f?'Aunt':'Uncle';
   if(dA===1&&dB===2) return f?'Niece':'Nephew';
   if(dA===3&&dB===1) return f?'GrandAunt':'GrandUncle';
   if(dA===1&&dB===3) return f?'GrandNiece':'GrandNephew';
-  if(dA>=4&&dB===1)  return f?`${dA-2}xGrGrandAunt`:`${dA-2}xGrGrandUncle`;
-  if(dA===1&&dB>=4)  return f?`${dB-2}xGrGrandNiece`:`${dB-2}xGrGrandNephew`;
-  if(dA===dB){ const n=dA-1; return n===1?'Cousin':`${ordinal(n)}Cousin`; }
+  if(dA>=4&&dB===1)  return f?`GrGrandAunt_${dA-2}`:`GrGrandUncle_${dA-2}`;
+  if(dA===1&&dB>=4)  return f?`GrGrandNiece_${dB-2}`:`GrGrandNephew_${dB-2}`;
+  if(dA===dB){ const n=dA-1; return n===1?'Cousin':`Cousin${n}`; }
   const minD=Math.min(dA,dB), removed=Math.abs(dA-dB), n=minD-1;
-  return `${n<=1?'1stCousin':ordinal(n)+'Cousin'}Rem${removed}`;
+  return `Cousin${n>1?n:'1'}_rem${removed}`;
 }
 
-/* Translate a relation key to display string */
+/** Translate a relationship key to display string in current language */
 function relLabel(key){
   if(!key) return '';
-  // Handle generated compound keys
-  if(key.includes('xGreatGrand')){
-    const m=key.match(/^(\d+)xGreatGrand(son|daughter|mother|father)$/);
-    if(m) return lang==='te'
-      ? `${m[1]}వ తరం పెద్ద${m[2]==='son'?'మనవడు':m[2]==='daughter'?'మనవరాలు':m[2]==='mother'?'నానమ్మ':'తాత'}`
-      : `${m[1]}× Great-Grand${m[2]}`;
-  }
-  if(key.includes('Cousin')){
-    const remM = key.match(/(.+)Rem(\d+)/);
-    if(remM){
-      const base=relLabel(remM[1].replace(/\d+/,'')==='1stCousin'?'Cousin':remM[1]);
-      return lang==='te'?`${base} (${remM[2]} తరం దూరం)`:`${base} (${remM[2]}× removed)`;
+  // Compound keys for extended relations
+  if(key.includes('xGGrand_')){
+    const [gen, gender] = key.split('xGGrand_');
+    const n = parseInt(gen);
+    if(lang==='te'){
+      const gn = gender==='d'?'మనవరాలు':gender==='s'?'మనవడు':gender==='m'?'నానమ్మ':'తాత';
+      return `${n}వ తరం ${gn}`;
     }
-    const ordM = key.match(/^(\d+(?:st|nd|rd|th))Cousin$/);
-    if(ordM) return lang==='te'?`${ordM[1]} దూర బంధువు`:`${ordM[1]} Cousin`;
+    const gn = gender==='d'?'Granddaughter':gender==='s'?'Grandson':gender==='m'?'Grandmother':'Grandfather';
+    return `${n}× Great-${gn}`;
+  }
+  if(key.startsWith('GrGrand')){
+    const m = key.match(/^GrGrand(Uncle|Aunt|Nephew|Niece)_(\d+)$/);
+    if(m){
+      const label = m[1]==='Uncle'?t('GrandUncle'):m[1]==='Aunt'?t('GrandAunt'):m[1]==='Nephew'?t('GrandNephew'):t('GrandNiece');
+      return lang==='te'?`${m[2]}వ తరం ${label}`:`${m[2]}× Great-${m[1]}`;
+    }
+  }
+  if(key.startsWith('Cousin')){
+    const remM = key.match(/^Cousin(\d*)_rem(\d+)$/);
+    if(remM){
+      const n = parseInt(remM[1])||1;
+      const r = parseInt(remM[2]);
+      const base = t('Cousin');
+      return lang==='te'?`${base} (${r} తరం దూరం)`:`${ordinal(n)} Cousin (${r}× removed)`;
+    }
+    const nM = key.match(/^Cousin(\d+)$/);
+    if(nM){ const n=parseInt(nM[1]); return lang==='te'?`${t('Cousin')} (${n}వ)`:`${ordinal(n)} Cousin`; }
     return t('Cousin');
   }
-  // Simple keys
   return t(key) || key;
 }
 
+/** Build full relMap: id → display string */
 function buildRelMap(youId){
-  const map={};
-  Object.keys(G).forEach(id=>{
-    const r=computeRel(youId,id);
-    if(r) map[id]=r;
+  const map = {};
+  Object.keys(G).forEach(id => {
+    const k = computeRelKey(youId, id);
+    if(k) map[id] = k;
   });
   return map;
 }
 
-/* ============================================================
-   STATE
-============================================================ */
-let youId=null, relMap={}, collapsed={};
+/* ================================================================
+   MODULE: STATE
+================================================================ */
+let youId       = null;   // selected "you" person ID
+let relMap      = {};     // id → relationship key
+let collapsed   = {};     // id → true if collapsed
+let pathSet     = new Set(); // IDs on lineage path
+let searchHitId = null;   // single search result ID
+let dimMode     = false;  // true when lineage path dimming is active
 
-/* ============================================================
-   TREE RENDERER
-============================================================ */
-function renderNodeHTML(id){
-  const p=G[id]; if(!p) return '';
-  const isYou=id===youId;
-  const relKey=relMap[id]||null;
-  const relDisp=relKey?relLabel(relKey):'';
+/* ================================================================
+   MODULE: TREE RENDERER
+================================================================ */
 
-  const boxCls='node-box'+(isYou?' is-you':'');
-  const nameCls='node-name'+(isYou?' you-nm':'');
-  const relCls='node-rel'+(isYou?' rel-you':'');
+/** Determine CSS classes for a node box */
+function nodeBoxClass(id){
+  let cls = 'node-box';
+  if(id === youId)       cls += ' is-you';
+  if(id === searchHitId) cls += ' search-hit';
+  if(pathSet.has(id) && id !== youId) cls += ' on-path';
+  if(dimMode && !pathSet.has(id) && id !== youId && id !== searchHitId) cls += ' dimmed';
+  return cls;
+}
 
-  let couple=`<div class="couple-wrap">
-    <div class="${boxCls}" onclick="nodeClick('${id}')">
-      <span class="${nameCls}">${p.name}</span>
-      ${relDisp?`<span class="${relCls}">${relDisp}</span>`:''}
-    </div>`;
-
-  if(p.spouseId&&G[p.spouseId]){
-    const sp=G[p.spouseId];
-    const spIsYou=p.spouseId===youId;
-    const spRelKey=relMap[p.spouseId]||null;
-    const spRelDisp=spRelKey?relLabel(spRelKey):'';
-    const spBox='node-box'+(spIsYou?' is-you':'');
-    const spName='node-name'+(spIsYou?' you-nm':'');
-    const spRc='node-rel'+(spIsYou?' rel-you':'');
-    couple+=`<div class="sp-line"></div>
-    <div class="${spBox}" onclick="nodeClick('${p.spouseId}')">
-      <span class="${spName}">${sp.name}</span>
-      ${spRelDisp?`<span class="${spRc}">${spRelDisp}</span>`:''}
-    </div>`;
+/** Connector line class (animated when on lineage path) */
+function vConnClass(childId){
+  if(pathSet.size > 0){
+    const p = G[childId];
+    if(p && (pathSet.has(childId) || pathSet.has(p.fatherId) || pathSet.has(p.motherId)))
+      return 'v-conn path-conn';
   }
-  couple+='</div>';
+  return 'v-conn';
+}
 
-  const hasChildren=p.childrenIds&&p.childrenIds.length>0;
-  const isColl=collapsed[id];
-  let childHTML='';
+function renderNodeHTML(id){
+  const p = G[id]; if(!p) return '';
+  const isYou    = id === youId;
+  const relKey   = relMap[id] || null;
+  const relDisp  = relKey ? relLabel(relKey) : '';
+
+  const nameCls = 'node-name' + (isYou ? ' you-nm' : '');
+  const relCls  = 'node-rel'  + (isYou ? ' rel-you' : '');
+
+  // Build the primary node box
+  let nodeInner = `
+    <div class="${nodeBoxClass(id)}" data-id="${id}" onclick="nodeClick('${id}')">
+      <span class="${nameCls}">${p.name}</span>
+      ${relDisp ? `<span class="${relCls}">${relDisp}</span>` : ''}
+    </div>`;
+
+  // Spouse box
+  let couple = `<div class="couple-wrap">${nodeInner}`;
+  if(p.spouseId && G[p.spouseId]){
+    const sp = G[p.spouseId];
+    const spRelKey  = relMap[p.spouseId] || null;
+    const spRelDisp = spRelKey ? relLabel(spRelKey) : '';
+    const spIsYou   = p.spouseId === youId;
+    const spNameCls = 'node-name' + (spIsYou ? ' you-nm' : '');
+    const spRelCls  = 'node-rel'  + (spIsYou ? ' rel-you' : '');
+    couple += `
+      <div class="sp-line"></div>
+      <div class="${nodeBoxClass(p.spouseId)}" data-id="${p.spouseId}" onclick="nodeClick('${p.spouseId}')">
+        <span class="${spNameCls}">${sp.name}</span>
+        ${spRelDisp ? `<span class="${spRelCls}">${spRelDisp}</span>` : ''}
+      </div>`;
+  }
+  couple += '</div>';
+
+  // Children area
+  const hasChildren = p.childrenIds && p.childrenIds.length > 0;
+  const isColl = collapsed[id];
+  let childHTML = '';
   if(hasChildren){
-    childHTML=`<div class="ch-area">
-      <div class="v-conn" style="height:10px"></div>
-      <div class="tog" onclick="togNode(event,'${id}')">${isColl?'+':'&minus;'}</div>`;
+    childHTML = `<div class="ch-area">
+      <div class="${vConnClass(id)}" style="height:10px"></div>
+      <div class="tog" onclick="togNode(event,'${id}')">${isColl ? '+' : '&minus;'}</div>`;
     if(!isColl){
-      childHTML+=`<div class="v-conn" style="height:8px"></div>`;
-      childHTML+=renderChildrenRow(p.childrenIds);
+      childHTML += `<div class="${vConnClass(id)}" style="height:8px"></div>`;
+      childHTML += renderChildrenRow(p.childrenIds);
     }
-    childHTML+='</div>';
+    childHTML += '</div>';
   }
   return `<div class="p-col">${couple}${childHTML}</div>`;
 }
 
 function renderChildrenRow(ids){
-  const valid=ids.filter(id=>G[id]); if(!valid.length) return '';
-  const cols=valid.map(cid=>`<div class="ch-col"><div class="v-conn" style="height:12px"></div>${renderNodeHTML(cid)}</div>`).join('');
-  const bar=valid.length>1?`<div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:calc(100% - 90px);height:1.5px;background:linear-gradient(90deg,transparent,#A07820,#A07820,transparent)"></div>`:'';
+  const valid = ids.filter(id => G[id]);
+  if(!valid.length) return '';
+
+  // Determine if this h-bar should be path-highlighted
+  const anyOnPath = valid.some(id => pathSet.has(id));
+  const barCls = anyOnPath && pathSet.size > 0 ? 'h-bar-connector path-h' : 'h-bar-connector';
+
+  const cols = valid.map(cid => {
+    const connCls = vConnClass(cid);
+    return `<div class="ch-col">
+      <div class="${connCls}" style="height:12px"></div>
+      ${renderNodeHTML(cid)}
+    </div>`;
+  }).join('');
+
+  const bar = valid.length > 1
+    ? `<div class="${barCls}" style="left:calc(50% - ${(valid.length*0.5-0.5)*80}px);width:calc(100% - 90px)"></div>`
+    : '';
+
   return `<div class="ch-row">${bar}${cols}</div>`;
 }
 
 function renderTree(){
-  const canvas=document.getElementById('tree-canvas');
-  if(canvas) canvas.innerHTML=renderNodeHTML(P_Veraiah);
+  const canvas = document.getElementById('tree-canvas');
+  if(canvas) canvas.innerHTML = renderNodeHTML(P_Veraiah);
 }
 
-/* ============================================================
-   TOOLBAR
-============================================================ */
+/* ================================================================
+   MODULE: SEARCH
+================================================================ */
+let searchTimeout = null;
+
+function initSearch(){
+  const input = document.getElementById('search-input');
+  const clearBtn = document.getElementById('search-clear');
+  const sugBox   = document.getElementById('search-suggestions');
+
+  input.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => handleSearch(input.value), 220);
+  });
+
+  input.addEventListener('keydown', e => {
+    if(e.key === 'Escape') clearSearch();
+  });
+
+  clearBtn.addEventListener('click', clearSearch);
+
+  // Close suggestions on outside click
+  document.addEventListener('click', e => {
+    if(!document.getElementById('search-box-wrap').contains(e.target)){
+      sugBox.style.display = 'none';
+    }
+  });
+}
+
+function handleSearch(query){
+  const sug = document.getElementById('search-suggestions');
+  const q = query.trim().toLowerCase();
+
+  if(!q){ clearSearch(); return; }
+
+  // Find all matches
+  const matches = Object.values(G).filter(p => p.name.toLowerCase().includes(q));
+
+  if(matches.length === 0){
+    searchHitId = null; sug.style.display = 'none'; renderTree(); return;
+  }
+
+  if(matches.length === 1){
+    // Exact single match — highlight immediately
+    sug.style.display = 'none';
+    applySearchHit(matches[0].id);
+  } else {
+    // Show suggestions
+    sug.innerHTML = matches.slice(0, 12).map(p => {
+      const father = p.fatherId ? G[p.fatherId]?.name : (p.motherId ? G[p.motherId]?.name : '');
+      const meta   = father ? `S/o · D/o ${father}` : (p.spouseId ? `Spouse: ${G[p.spouseId]?.name}` : '');
+      return `<div class="search-sug-item" onclick="selectSuggestion('${p.id}')">
+        <span class="sug-name">${p.name}</span>
+        ${meta ? `<span class="sug-meta">${meta}</span>` : ''}
+      </div>`;
+    }).join('');
+    sug.style.display = 'block';
+    // Still highlight first match faintly
+    searchHitId = null; renderTree();
+  }
+}
+
+function selectSuggestion(id){
+  document.getElementById('search-suggestions').style.display = 'none';
+  document.getElementById('search-input').value = G[id]?.name || '';
+  applySearchHit(id);
+}
+
+function applySearchHit(id){
+  searchHitId = id;
+  // Auto-expand ancestors so node is visible
+  expandAncestors(id);
+  renderTree();
+  // Scroll to the node after render
+  setTimeout(() => scrollToNode(id), 60);
+}
+
+/** Expand all ancestors of a node to make it visible */
+function expandAncestors(id){
+  let cur = id;
+  while(cur){
+    const p = G[cur];
+    if(!p) break;
+    // Find parent who has this as a child
+    const parentId = Object.keys(G).find(pid =>
+      G[pid].childrenIds && G[pid].childrenIds.includes(cur)
+    );
+    if(parentId){
+      collapsed[parentId] = false;
+      cur = parentId;
+    } else break;
+  }
+}
+
+/** Pan viewport to center a node by its data-id */
+function scrollToNode(id){
+  const el = document.querySelector(`[data-id="${id}"]`);
+  const vp = document.getElementById('tree-viewport');
+  if(!el || !vp) return;
+  const rect  = el.getBoundingClientRect();
+  const vpRect = vp.getBoundingClientRect();
+  const targetX = rect.left + rect.width/2  - vpRect.left  - vpRect.width/2;
+  const targetY = rect.top  + rect.height/2 - vpRect.top   - vpRect.height/2;
+  tx -= targetX; ty -= targetY;
+  applyT(true);
+}
+
+function clearSearch(){
+  searchHitId = null;
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-suggestions').style.display = 'none';
+  renderTree();
+}
+
+/* ================================================================
+   MODULE: TOOLBAR & BARS
+================================================================ */
 function renderToolbar(){
-  const tb=document.getElementById('toolbar'); if(!tb) return;
-  tb.innerHTML=`
+  const tb = document.getElementById('toolbar'); if(!tb) return;
+  tb.innerHTML = `
     <div class="lang-toggle">
-      <button class="lang-opt${lang==='en'?' active':''}" onclick="setLang('en')">${T.en.btnLangEn}</button>
-      <button class="lang-opt${lang==='te'?' active':''}" onclick="setLang('te')">${T.te.btnLangTe} తెలుగు</button>
+      <button class="lang-opt${lang==='en'?' active':''}" onclick="setLang('en')">EN</button>
+      <button class="lang-opt${lang==='te'?' active':''}" onclick="setLang('te')">తె Telugu</button>
     </div>
     <button class="btn btn-primary" onclick="openModal()">${t('btnRelation')}</button>
     <button class="btn" onclick="expandAll()">${t('btnExpand')}</button>
     <button class="btn" onclick="collapseAll()">${t('btnCollapse')}</button>
-    ${youId?`<button class="btn btn-danger" onclick="clearYou()">${t('btnClear')}</button>`:''}`;
+    ${youId ? `<button class="btn btn-danger" onclick="clearYou()">${t('btnClear')}</button>` : ''}`;
 }
 
 function renderYouBar(){
-  const bar=document.getElementById('you-bar'); if(!bar) return;
+  const bar = document.getElementById('you-bar'); if(!bar) return;
   if(youId){
-    bar.style.display='block';
-    bar.innerHTML=`${t('youBarPrefix')} <b>${G[youId].name}</b> &nbsp;·&nbsp; ${t('youBarSuffix')}`;
-  } else { bar.style.display='none'; }
+    bar.style.display = 'block';
+    bar.innerHTML = `${t('youBarPre')} <b>${G[youId].name}</b> &nbsp;·&nbsp; ${t('youBarSuf')}`;
+  } else { bar.style.display = 'none'; }
 }
 
-/* ============================================================
-   ACTIONS
-============================================================ */
-function nodeClick(id){}
-function togNode(e,id){ e.stopPropagation(); collapsed[id]=!collapsed[id]; renderTree(); }
-function expandAll(){ collapsed={}; renderTree(); }
-function collapseAll(){ Object.keys(G).forEach(id=>{ if(G[id].childrenIds&&G[id].childrenIds.length) collapsed[id]=true; }); renderTree(); }
-function clearYou(){ youId=null; relMap={}; renderToolbar(); renderYouBar(); renderTree(); }
-function setYou(id){ youId=id; relMap=buildRelMap(id); renderToolbar(); renderYouBar(); renderTree(); }
+/* ================================================================
+   MODULE: ACTIONS
+================================================================ */
+function nodeClick(id){
+  // Click on a node during search → jump to relationship modal
+}
 
-/* ============================================================
-   MODAL
-============================================================ */
+function togNode(e, id){
+  e.stopPropagation();
+  collapsed[id] = !collapsed[id];
+  renderTree();
+}
+
+function expandAll(){ collapsed = {}; renderTree(); }
+
+function collapseAll(){
+  Object.keys(G).forEach(id => {
+    if(G[id].childrenIds && G[id].childrenIds.length) collapsed[id] = true;
+  });
+  renderTree();
+}
+
+function clearYou(){
+  youId = null; relMap = {}; pathSet = new Set(); dimMode = false;
+  renderToolbar(); renderYouBar(); renderTree();
+}
+
+function setYou(id){
+  youId   = id;
+  relMap  = buildRelMap(id);
+  pathSet = new Set(); dimMode = false; // reset, will be set per targetId below
+  renderToolbar(); renderYouBar(); renderTree();
+}
+
+/* ================================================================
+   MODULE: MODAL — Know Your Relationship
+================================================================ */
 function openModal(){
-  const fathersList=Object.values(G).filter(p=>p.childrenIds&&p.childrenIds.length).sort((a,b)=>a.name.localeCompare(b.name));
-  const fOpts=fathersList.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
-  const teFont=lang==='te'?'font-family:"Noto Serif Telugu",serif;':' ';
-  document.getElementById('modal-root').innerHTML=`
+  const fList = Object.values(G)
+    .filter(p => p.childrenIds && p.childrenIds.length)
+    .sort((a,b) => a.name.localeCompare(b.name));
+  const fOpts = fList.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+  const teF = lang==='te' ? 'font-family:"Noto Serif Telugu",serif;' : '';
+
+  document.getElementById('modal-root').innerHTML = `
     <div class="modal-overlay" id="moverlay" onclick="mClick(event)">
-      <div class="modal" style="${teFont}">
+      <div class="modal" style="${teF}">
         <h2>${t('modalTitle')}</h2>
         <p>${t('modalDesc')}</p>
         <div class="fgrp">
@@ -918,7 +1384,7 @@ function openModal(){
           <input id="inp-name" placeholder="${t('placeholderName')}" onkeydown="if(event.key==='Enter')doFind()"/>
         </div>
         <div class="fgrp">
-          <label>${t('labelFather')} <span style="font-size:.55rem;opacity:.55">${t('labelFatherHint')}</span></label>
+          <label>${t('labelFather')} <span style="font-size:.55rem;opacity:.5">${t('labelFatherHint')}</span></label>
           <select id="inp-father">
             <option value="">${t('fatherDefault')}</option>
             ${fOpts}
@@ -932,83 +1398,156 @@ function openModal(){
         </div>
       </div>
     </div>`;
-  setTimeout(()=>{ const el=document.getElementById('inp-name'); if(el) el.focus(); },50);
+  setTimeout(() => { const el = document.getElementById('inp-name'); if(el) el.focus(); }, 50);
 }
-function mClick(e){ if(e.target.id==='moverlay') closeModal(); }
-function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
+
+function mClick(e){ if(e.target.id === 'moverlay') closeModal(); }
+function closeModal(){ document.getElementById('modal-root').innerHTML = ''; }
+
 function doFind(){
-  const name=(document.getElementById('inp-name').value||'').trim().toLowerCase();
-  const fid=document.getElementById('inp-father').value;
-  const err=document.getElementById('modal-err');
-  if(!name){ err.textContent=t('errNoName'); return; }
-  let matches=Object.values(G).filter(p=>p.name.toLowerCase()===name);
-  if(fid) matches=matches.filter(p=>p.fatherId===fid||p.motherId===fid);
-  if(matches.length===0){ err.textContent=t('errNotFound'); return; }
-  if(matches.length>1)  { err.textContent=t('errMultiple'); return; }
-  closeModal(); setYou(matches[0].id);
+  const name  = (document.getElementById('inp-name').value || '').trim().toLowerCase();
+  const fid   = document.getElementById('inp-father').value;
+  const errEl = document.getElementById('modal-err');
+
+  if(!name){ errEl.textContent = t('errNoName'); return; }
+
+  let matches = Object.values(G).filter(p => p.name.toLowerCase() === name);
+  if(fid) matches = matches.filter(p => p.fatherId === fid || p.motherId === fid);
+
+  if(matches.length === 0){ errEl.textContent = t('errNotFound'); return; }
+  if(matches.length > 1)  { errEl.textContent = t('errMultiple'); return; }
+
+  closeModal();
+  const foundId = matches[0].id;
+  setYou(foundId);
+
+  // After setting "you", compute lineage path to all blood relatives and dim others
+  activateLineageMode(foundId);
 }
 
-/* ============================================================
-   ZOOM & PAN
-============================================================ */
-let scale=0.85, tx=0, ty=20, isPanning=false, lastX=0, lastY=0;
-function applyT(anim){
-  const c=document.getElementById('tree-canvas'); if(!c) return;
-  c.style.transition=anim?'transform 0.28s ease':'none';
-  c.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;
-  document.getElementById('zoom-label').textContent=Math.round(scale*100)+'%';
-}
-function centerTree(){
-  const vp=document.getElementById('tree-viewport'), c=document.getElementById('tree-canvas');
-  if(!vp||!c) return;
-  tx=Math.max((vp.clientWidth-c.scrollWidth*scale)/2,20); ty=20; applyT(true);
-}
-document.getElementById('zoom-in').onclick=()=>{scale=Math.min(scale*1.2,3);applyT(true)};
-document.getElementById('zoom-out').onclick=()=>{scale=Math.max(scale/1.2,0.15);applyT(true)};
-document.getElementById('zoom-reset').onclick=()=>{scale=0.85;centerTree()};
-const vp=document.getElementById('tree-viewport');
-vp.addEventListener('wheel',e=>{
-  e.preventDefault();
-  const d=e.deltaY>0?0.9:1.1, r=vp.getBoundingClientRect();
-  const mx=e.clientX-r.left, my=e.clientY-r.top;
-  const ns=Math.min(Math.max(scale*d,0.15),3);
-  tx=mx-(mx-tx)*(ns/scale); ty=my-(my-ty)*(ns/scale); scale=ns; applyT(false);
-},{passive:false});
-vp.addEventListener('mousedown',e=>{if(e.button!==0)return;isPanning=true;lastX=e.clientX;lastY=e.clientY;vp.classList.add('panning')});
-window.addEventListener('mousemove',e=>{if(!isPanning)return;tx+=e.clientX-lastX;ty+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;applyT(false)});
-window.addEventListener('mouseup',()=>{isPanning=false;vp.classList.remove('panning')});
-let ltx=0,lty=0,ld=0;
-vp.addEventListener('touchstart',e=>{
-  if(e.touches.length===1){ltx=e.touches[0].clientX;lty=e.touches[0].clientY;}
-  else if(e.touches.length===2) ld=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-},{passive:true});
-vp.addEventListener('touchmove',e=>{
-  e.preventDefault();
-  if(e.touches.length===1){tx+=e.touches[0].clientX-ltx;ty+=e.touches[0].clientY-lty;ltx=e.touches[0].clientX;lty=e.touches[0].clientY;applyT(false);}
-  else if(e.touches.length===2){
-    const nd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-    if(ld){scale=Math.min(Math.max(scale*(nd/ld),0.15),3);applyT(false);}ld=nd;
+/** Highlight the lineage path and dim non-related nodes */
+function activateLineageMode(youId){
+  // Build union of all paths from youId to each known relative
+  const allPathIds = new Set([youId]);
+  // Add ancestors
+  ancestorMap(youId).forEach((d, id) => allPathIds.add(id));
+  // Add descendants
+  function addDesc(id){
+    const p = G[id]; if(!p) return;
+    if(p.childrenIds) p.childrenIds.forEach(cid => { allPathIds.add(cid); addDesc(cid); });
   }
-},{passive:false});
+  addDesc(youId);
+  // Add spouses of path members
+  const extras = [];
+  allPathIds.forEach(id => { if(G[id]?.spouseId) extras.push(G[id].spouseId); });
+  extras.forEach(id => allPathIds.add(id));
 
-/* ============================================================
-   TIMELINE
-============================================================ */
-function buildTimeline(){
-  const track=document.getElementById('timeline-track');
-  const seg=`<span class="timeline-seg"><span class="timeline-gem"></span><span class="timeline-text">${t('timeline')}</span><span class="timeline-gem"></span></span>`;
-  track.innerHTML=seg.repeat(6);
+  pathSet = allPathIds;
+  dimMode = true;
+  renderTree();
+
+  // Auto-expand to show you node
+  expandAncestors(youId);
+  renderTree();
+  setTimeout(() => scrollToNode(youId), 80);
 }
 
-/* ============================================================
-   BOOT
-============================================================ */
+/* ================================================================
+   MODULE: ZOOM & PAN
+================================================================ */
+let scale = 0.85, tx = 0, ty = 20;
+let isPanning = false, lastX = 0, lastY = 0;
+
+function applyT(anim){
+  const c = document.getElementById('tree-canvas'); if(!c) return;
+  c.style.transition = anim ? 'transform 0.3s ease' : 'none';
+  c.style.transform  = `translate(${tx}px,${ty}px) scale(${scale})`;
+  const lbl = document.getElementById('zoom-label');
+  if(lbl) lbl.textContent = Math.round(scale * 100) + '%';
+}
+
+function centerTree(){
+  const vp = document.getElementById('tree-viewport');
+  const c  = document.getElementById('tree-canvas');
+  if(!vp || !c) return;
+  tx = Math.max((vp.clientWidth - c.scrollWidth * scale) / 2, 20);
+  ty = 20;
+  applyT(true);
+}
+
+document.getElementById('zoom-in').onclick    = () => { scale = Math.min(scale * 1.2, 3); applyT(true); };
+document.getElementById('zoom-out').onclick   = () => { scale = Math.max(scale / 1.2, 0.15); applyT(true); };
+document.getElementById('zoom-reset').onclick = () => { scale = 0.85; centerTree(); };
+
+const vpEl = document.getElementById('tree-viewport');
+
+// Mouse wheel zoom
+vpEl.addEventListener('wheel', e => {
+  e.preventDefault();
+  const d = e.deltaY > 0 ? 0.9 : 1.1;
+  const r = vpEl.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const ns = Math.min(Math.max(scale * d, 0.15), 3);
+  tx = mx - (mx - tx) * (ns / scale);
+  ty = my - (my - ty) * (ns / scale);
+  scale = ns; applyT(false);
+}, { passive: false });
+
+// Mouse drag
+vpEl.addEventListener('mousedown', e => {
+  if(e.button !== 0) return;
+  isPanning = true; lastX = e.clientX; lastY = e.clientY;
+  vpEl.classList.add('panning');
+});
+window.addEventListener('mousemove', e => {
+  if(!isPanning) return;
+  tx += e.clientX - lastX; ty += e.clientY - lastY;
+  lastX = e.clientX; lastY = e.clientY; applyT(false);
+});
+window.addEventListener('mouseup', () => { isPanning = false; vpEl.classList.remove('panning'); });
+
+// Touch pan & pinch-zoom
+let ltx = 0, lty = 0, ld = 0;
+vpEl.addEventListener('touchstart', e => {
+  if(e.touches.length === 1){ ltx = e.touches[0].clientX; lty = e.touches[0].clientY; }
+  else if(e.touches.length === 2)
+    ld = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+}, { passive: true });
+vpEl.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if(e.touches.length === 1){
+    tx += e.touches[0].clientX - ltx; ty += e.touches[0].clientY - lty;
+    ltx = e.touches[0].clientX; lty = e.touches[0].clientY; applyT(false);
+  } else if(e.touches.length === 2){
+    const nd = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    if(ld){ scale = Math.min(Math.max(scale * (nd / ld), 0.15), 3); applyT(false); }
+    ld = nd;
+  }
+}, { passive: false });
+
+/* ================================================================
+   MODULE: TIMELINE
+================================================================ */
+function buildTimeline(){
+  const track = document.getElementById('timeline-track');
+  const seg = `<span class="timeline-seg">
+    <span class="timeline-gem"></span>
+    <span class="timeline-text">${t('timeline')}</span>
+    <span class="timeline-gem"></span>
+  </span>`;
+  track.innerHTML = seg.repeat(6);
+}
+
+/* ================================================================
+   BOOT — initialise everything
+================================================================ */
 applyUIStrings();
+initSearch();
 renderToolbar();
 renderYouBar();
 renderTree();
 buildTimeline();
-setTimeout(centerTree,120);
+setTimeout(centerTree, 120);
 </script>
 </body>
-</html>
+</html> 		
