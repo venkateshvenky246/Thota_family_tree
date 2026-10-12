@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Thota Family Tree · థోటా వంశ వృక్షం</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,400&family=Noto+Serif+Telugu:wght@300;400;500;600&family=Noto+Serif:wght@300;400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,400&family=Noto+Serif+Telugu:wght@300;400;500;600;700&family=Noto+Sans+Telugu:wght@400;500;600&family=Noto+Serif:wght@300;400&display=swap" rel="stylesheet">
 <style>
 /* ================================================================
    RESET & CSS VARIABLES
@@ -31,14 +32,6 @@
 html,body{width:100%;min-height:100vh;background:var(--ink);color:var(--ink);
   font-family:'Crimson Pro',Georgia,serif;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
 
-/* ── TELUGU MODE ── */
-body.lang-te .header h1,body.lang-te .btn,body.lang-te .node-rel,
-body.lang-te .modal h2,body.lang-te .fgrp label,body.lang-te .modal p,
-body.lang-te .header-sub,body.lang-te .you-bar,body.lang-te .leg-item,
-body.lang-te .hint-bar,body.lang-te .search-wrap input,
-body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif}
-body.lang-te .node-rel{font-size:0.58rem;letter-spacing:0}
-body.lang-te .btn{letter-spacing:0.01em}
 
 /* ================================================================
    BACKGROUND — Mandala / Rangoli
@@ -157,119 +150,67 @@ body.lang-te .btn{letter-spacing:0.01em}
   font-size:0.64rem;color:rgba(212,175,55,0.3);letter-spacing:0.05em}
 
 /* ================================================================
-   TREE VIEWPORT — ZOOM & PAN
+   3D STAGE
 ================================================================ */
-.tree-viewport{position:relative;z-index:5;overflow:hidden;flex:1;cursor:grab;
-  height:calc(100vh - 260px);min-height:380px;touch-action:none}
-.tree-viewport.panning{cursor:grabbing}
-.tree-canvas{position:absolute;transform-origin:0 0;padding:3rem 4rem 5rem;
-  display:inline-flex;flex-direction:column;align-items:center;will-change:transform;
-  transition:transform 0.04s linear}
+.shell{position:relative;z-index:5;display:flex;flex-direction:column;height:100vh;height:100dvh;padding-bottom:38px}
+.stage{position:relative;z-index:5;flex:1 1 auto;min-height:400px;overflow:hidden;cursor:grab;
+  touch-action:none;user-select:none;-webkit-user-select:none;
+  background:radial-gradient(ellipse at 50% 40%,rgba(212,175,55,0.08),transparent 62%)}
+.stage.dragging{cursor:grabbing}
+#edges{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+#nodes{position:absolute;left:0;top:0;width:100%;height:100%}
 
-/* ================================================================
-   NODE STYLES
-================================================================ */
-.p-col{display:flex;flex-direction:column;align-items:center}
-.couple-wrap{display:flex;align-items:center}
-
-/* Spouse connector line */
-.sp-line{width:18px;height:2px;
-  background:linear-gradient(90deg,var(--gold-dk),var(--saffron-dk));
-  flex-shrink:0;position:relative}
-.sp-line::after{content:'✦';position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);font-size:6px;color:var(--gold)}
-
-/* Node card */
-.node-box{min-width:84px;max-width:118px;padding:0.36rem 0.62rem 0.3rem;
-  border-radius:9px;background:var(--node-bg);border:1.5px solid var(--node-border);
-  box-shadow:0 2px 10px var(--shadow-warm),inset 0 1px 0 rgba(255,255,255,0.75);
-  cursor:pointer;text-align:center;position:relative;
-  transition:transform var(--transition-speed),box-shadow var(--transition-speed),
-    border-color var(--transition-speed),opacity var(--transition-speed);
-  animation:node-appear 0.35s ease both}
-@keyframes node-appear{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.node-box::before{content:'';position:absolute;inset:-1px;border-radius:10px;
-  background:linear-gradient(135deg,rgba(212,175,55,0.28) 0%,transparent 55%,rgba(255,153,51,0.12) 100%);
-  pointer-events:none}
-.node-box:hover{transform:translateY(-2px) scale(1.05);
-  box-shadow:0 8px 22px rgba(180,100,0,0.32),inset 0 1px 0 rgba(255,255,255,0.9);
-  border-color:var(--saffron);z-index:20}
-
-/* YOU highlight */
-.node-box.is-you{background:linear-gradient(155deg,#FFFCE0 0%,#FFE89A 100%);
-  border-color:var(--saffron);z-index:15;
-  box-shadow:0 0 0 3px rgba(255,153,51,0.28),0 0 24px var(--glow-you),
-    0 4px 16px rgba(200,100,0,0.38),inset 0 1px 0 rgba(255,255,255,0.9);
-  animation:you-pulse 2.8s ease-in-out infinite,node-appear 0.35s ease both}
+/* ── Family card (one per couple / person) ── */
+.u-card{position:absolute;left:0;top:0;display:none;min-width:92px;max-width:138px;padding:2px;
+  border-radius:10px;background:var(--node-bg);border:1.5px solid var(--node-border);
+  box-shadow:0 3px 12px var(--shadow-warm),inset 0 1px 0 rgba(255,255,255,0.75);
+  cursor:pointer;text-align:center;transform-origin:50% 50%}
+.u-card::before{content:'';position:absolute;inset:-1px;border-radius:10px;pointer-events:none;
+  background:linear-gradient(135deg,rgba(212,175,55,0.28) 0%,transparent 55%,rgba(255,153,51,0.12) 100%)}
+.u-card:hover{border-color:var(--saffron);box-shadow:0 6px 22px rgba(180,100,0,0.4),inset 0 1px 0 rgba(255,255,255,0.9)}
+.u-card.on-path{border-color:var(--path-color);
+  box-shadow:0 0 0 2px rgba(255,215,0,0.45),0 0 20px rgba(255,215,0,0.55)}
+.u-card.has-you{border-color:var(--saffron);animation:you-pulse 2.8s ease-in-out infinite}
+.u-card.has-hit{border-color:var(--gold-lt)}
 @keyframes you-pulse{
-  0%,100%{box-shadow:0 0 0 3px rgba(255,153,51,0.25),0 0 20px rgba(255,153,51,0.5),0 4px 14px rgba(200,100,0,0.35)}
-  50%  {box-shadow:0 0 0 6px rgba(255,153,51,0.1),0 0 40px rgba(255,153,51,0.8),0 4px 20px rgba(200,100,0,0.45)}}
+  0%,100%{box-shadow:0 0 0 3px rgba(255,153,51,0.25),0 0 20px rgba(255,153,51,0.5)}
+  50%{box-shadow:0 0 0 6px rgba(255,153,51,0.1),0 0 40px rgba(255,153,51,0.85)}}
+.u-card.dimmed{filter:grayscale(60%)}
 
-/* SEARCH highlight */
-.node-box.search-hit{border-color:var(--gold-lt);z-index:18;
-  background:linear-gradient(155deg,#FFFFF0 0%,#FFEDAA 100%);
-  box-shadow:0 0 0 3px rgba(255,215,0,0.4),0 0 28px rgba(255,215,0,0.7),0 4px 16px rgba(180,140,0,0.4);
-  animation:search-pulse 1.8s ease-in-out infinite,node-appear 0.35s ease both;
-  transform:scale(1.08)}
-@keyframes search-pulse{
-  0%,100%{box-shadow:0 0 0 3px rgba(255,215,0,0.35),0 0 22px rgba(255,215,0,0.6)}
-  50%    {box-shadow:0 0 0 6px rgba(255,215,0,0.15),0 0 38px rgba(255,215,0,0.9)}}
+.u-row{position:relative;padding:0.3rem 0.6rem 0.26rem;border-radius:7px}
+.u-row+.u-row{margin-top:2px}
+.u-row+.u-row::before{content:'✦';position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  font-size:7px;line-height:1;color:var(--gold-dk);background:var(--node-bg);padding:0 3px;z-index:1}
+.u-row+.u-row{border-top:1px solid rgba(160,120,32,0.45)}
+.u-name{display:block;font-family:'Crimson Pro',serif;font-weight:500;font-size:0.78rem;
+  color:var(--ink);line-height:1.25;word-break:break-word}
+.u-name.you-nm{color:var(--maroon);font-weight:700}
+.u-rel{display:block;font-family:'Cinzel',serif;font-size:0.54rem;letter-spacing:0.05em;
+  color:var(--maroon-lt);margin-top:2px;line-height:1.3}
+.u-rel.rel-you{color:var(--maroon-dk);font-weight:700;background:rgba(255,153,51,0.22);
+  border-radius:3px;padding:1px 4px}
+.u-row.on-path{background:linear-gradient(155deg,#FFFAE8 0%,#FFE9A0 100%)}
+.u-row.search-hit{background:linear-gradient(155deg,#FFFFF0 0%,#FFEDAA 100%);
+  box-shadow:0 0 0 2px rgba(255,215,0,0.6),0 0 18px rgba(255,215,0,0.7)}
+.u-row.is-you{background:linear-gradient(155deg,#FFFCE0 0%,#FFE89A 100%);
+  box-shadow:0 0 0 2px rgba(255,153,51,0.55),0 0 18px var(--glow-you)}
 
-/* LINEAGE PATH highlight */
-.node-box.on-path{border-color:var(--path-color);z-index:16;
-  box-shadow:0 0 0 2px rgba(255,215,0,0.5),0 0 18px rgba(255,215,0,0.6);
-  background:linear-gradient(155deg,#FFFAE8 0%,#FFE9A0 100%)}
+/* expand / collapse badge */
+.u-tog{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);width:19px;height:19px;
+  border-radius:50%;background:radial-gradient(circle,var(--cream) 60%,var(--cream-dk) 100%);
+  border:1px solid var(--gold-dk);color:var(--maroon);font:700 12px/17px monospace;text-align:center;
+  cursor:pointer;box-shadow:0 1px 4px rgba(180,100,0,0.3);z-index:3}
+.u-tog:hover{background:radial-gradient(circle,var(--saffron-lt) 60%,var(--saffron) 100%);border-color:var(--saffron)}
 
-/* DIMMED (when relationship mode active) */
-.node-box.dimmed{opacity:var(--dim-opacity);filter:grayscale(60%)}
-
-/* Node text */
-.node-name{font-family:'Crimson Pro',serif;font-weight:500;font-size:0.73rem;
-  color:var(--ink);line-height:1.25;display:block}
-.node-name.you-nm{color:var(--maroon);font-weight:700}
-.node-rel{display:block;font-family:'Cinzel',serif;font-size:0.54rem;
-  letter-spacing:0.05em;color:var(--maroon-lt);margin-top:2px;line-height:1.3}
-.node-rel.rel-you{color:var(--maroon-dk);font-weight:700;
-  background:rgba(255,153,51,0.22);border-radius:3px;padding:1px 4px}
-
-/* ================================================================
-   TREE CONNECTORS
-================================================================ */
-.v-conn{width:1.5px;background:linear-gradient(180deg,var(--gold-dk),rgba(180,120,0,0.25));flex-shrink:0}
-
-/* Animated path connector (lineage highlight) */
-.v-conn.path-conn{background:linear-gradient(180deg,#FFD700,#FFA500);
-  width:2.5px;box-shadow:0 0 6px rgba(255,215,0,0.7);
-  animation:path-flow 1.2s linear infinite}
-@keyframes path-flow{
-  0%{background:linear-gradient(180deg,#FFD700 0%,#FFA500 50%,#FFD700 100%)}
-  100%{background:linear-gradient(180deg,#FFA500 0%,#FFD700 50%,#FFA500 100%)}}
-
-.tog{width:15px;height:15px;border-radius:50%;
-  background:radial-gradient(circle,var(--cream) 60%,var(--cream-dk) 100%);
-  border:1px solid var(--gold-dk);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:8px;color:var(--maroon);font-weight:700;flex-shrink:0;
-  margin:1px 0;transition:all .18s;box-shadow:0 1px 4px rgba(180,100,0,0.22);
-  font-family:monospace;line-height:1;user-select:none;
-  min-width:15px;min-height:15px;touch-action:manipulation}
-.tog:hover,.tog:active{background:radial-gradient(circle,var(--saffron-lt) 60%,var(--saffron) 100%);
-  border-color:var(--saffron);box-shadow:0 0 8px rgba(255,153,51,0.45)}
-
-.ch-area{display:flex;flex-direction:column;align-items:center}
-.ch-row{display:flex;align-items:flex-start;position:relative}
-.ch-col{display:flex;flex-direction:column;align-items:center;padding:0 5px;
-  animation:slide-in 0.3s ease both}
-@keyframes slide-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-
-/* Horizontal connector bar */
-.h-bar-connector{position:absolute;top:0;height:1.5px;
-  background:linear-gradient(90deg,transparent,var(--gold-dk),var(--gold-dk),transparent);
-  pointer-events:none}
-.h-bar-connector.path-h{background:linear-gradient(90deg,transparent,#FFD700,#FFD700,transparent);
-  height:2.5px;box-shadow:0 0 6px rgba(255,215,0,0.7);animation:path-flow-h 1.2s linear infinite}
-@keyframes path-flow-h{
-  0%{background:linear-gradient(90deg,transparent,#FFD700,#FFA500,transparent)}
-  100%{background:linear-gradient(90deg,transparent,#FFA500,#FFD700,transparent)}}
+/* ── Bloodline bar ── */
+.yb-chain{display:flex;flex-wrap:wrap;gap:4px 3px;justify-content:center;align-items:center;margin-top:0.3rem}
+.chip{padding:0.1rem 0.55rem;border-radius:12px;border:1px solid rgba(255,215,0,0.4);
+  background:rgba(255,215,0,0.08);color:var(--gold-lt);cursor:pointer;font-size:0.7rem;
+  transition:background .15s}
+.chip:hover{background:rgba(255,215,0,0.2)}
+.chip.last{background:rgba(255,153,51,0.28);border-color:var(--saffron);color:var(--cream)}
+.chip-arrow{color:rgba(255,215,0,0.5);font-size:0.7rem}
+.yb-stats{margin-top:0.2rem;font-size:0.64rem;color:rgba(255,215,160,0.6)}
 
 /* ================================================================
    MODAL
@@ -349,27 +290,59 @@ body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif;font-style:nor
   color:rgba(253,240,180,0.58);font-family:'Noto Serif',serif}
 .leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 
+.zoom-btn.on{background:rgba(212,175,55,0.3);border-color:var(--gold);color:var(--cream)}
+.zoom-btn.sm{font-size:0.8rem}
+
 /* ================================================================
-   MOBILE RESPONSIVE
+   MOBILE
 ================================================================ */
 @media(max-width:600px){
   .header h1{font-size:1.3rem}
   .toolbar{gap:0.3rem;padding:0.4rem 0.5rem}
   .btn{font-size:0.6rem;padding:0.35rem 0.65rem;min-height:34px}
   .lang-opt{padding:0.3rem 0.6rem;font-size:0.62rem}
-  .tree-viewport{height:calc(100vh - 280px)}
-  .node-box{min-width:72px;max-width:100px;padding:0.28rem 0.45rem 0.24rem}
-  .node-name{font-size:0.65rem}
-  .node-rel{font-size:0.48rem}
+  .stage{min-height:460px}
+  .u-name{font-size:0.7rem}
+  .u-rel{font-size:0.5rem}
   .legend{display:none}
   .last-updated{font-size:0.58rem}
   .search-box{max-width:100%}
+  .yb-chain .chip{font-size:0.64rem;padding:0.08rem 0.45rem}
 }
-@media(max-width:380px){
-  .btn{font-size:0.56rem;padding:0.3rem 0.55rem}
-  .node-box{min-width:62px;max-width:88px}
-  .node-name{font-size:0.6rem}
+@media(max-width:380px){.btn{font-size:0.56rem;padding:0.3rem 0.55rem}}
+@media(prefers-reduced-motion:reduce){
+  .bg-layer::after,.timeline-track,.u-card.has-you{animation:none}
 }
+
+/* ================================================================
+   TELUGU MODE — proper shaping: no letter-spacing, no forced caps,
+   a real Telugu font on EVERYTHING (names, cards, modal, inputs)
+================================================================ */
+body.lang-te,
+body.lang-te *{
+  font-family:'Noto Serif Telugu','Noto Sans Telugu','Nirmala UI','Gautami','Vani','Telugu Sangam MN',serif;
+  letter-spacing:0 !important;text-transform:none !important;font-style:normal}
+body.lang-te .u-name{font-size:0.8rem;line-height:1.5;font-weight:500}
+body.lang-te .u-name.you-nm{font-weight:700}
+body.lang-te .u-rel{font-size:0.62rem;line-height:1.5}
+body.lang-te .header h1{line-height:1.35}
+body.lang-te .header-sub{font-size:0.8rem}
+body.lang-te .btn{font-size:0.74rem;line-height:1.4}
+body.lang-te .lang-opt{font-size:0.74rem}
+body.lang-te .fgrp label{font-size:0.72rem}
+body.lang-te .modal p,body.lang-te .you-bar,body.lang-te .hint-bar,body.lang-te .leg-item{line-height:1.6}
+body.lang-te .zoom-btn,body.lang-te .u-tog{font-family:monospace}
+body.lang-te .timeline-text{font-size:0.8rem}
+@media(max-width:600px){
+  body.lang-te .u-name{font-size:0.74rem}
+  body.lang-te .u-rel{font-size:0.56rem}
+  body.lang-te .btn{font-size:0.66rem}
+}
+.header{padding:0.65rem 1rem 0.45rem}
+.header-ornament{display:none}
+.header h1{font-size:clamp(1.25rem,3vw,2rem)}
+.search-wrap{padding:0.4rem 1rem}
+.toolbar{padding:0.4rem 0.8rem}
 </style>
 </head>
 <body>
@@ -423,9 +396,8 @@ body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif;font-style:nor
 </svg>
 
 <!-- ── APP SHELL ── -->
-<div style="position:relative;z-index:5;display:flex;flex-direction:column;min-height:100vh">
+<div class="shell">
 
-  <!-- HEADER -->
   <header class="header">
     <div class="header-ornament">
       <div class="ornament-line"></div>
@@ -437,7 +409,6 @@ body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif;font-style:nor
     <div class="last-updated" id="last-updated"></div>
   </header>
 
-  <!-- SEARCH -->
   <div class="search-wrap">
     <div class="search-box" id="search-box-wrap">
       <input type="text" id="search-input" placeholder="Search by name…" autocomplete="off" spellcheck="false"/>
@@ -446,17 +417,16 @@ body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif;font-style:nor
     </div>
   </div>
 
-  <!-- TOOLBAR -->
   <div class="toolbar" id="toolbar"></div>
   <div class="you-bar" id="you-bar"></div>
-  <div class="hint-bar" id="hint-bar">Drag to pan · Scroll / pinch to zoom · +/− to expand / collapse</div>
+  <div class="hint-bar" id="hint-bar"></div>
 
-  <!-- TREE VIEWPORT -->
-  <div class="tree-viewport" id="tree-viewport">
-    <div class="tree-canvas" id="tree-canvas"></div>
+  <!-- 3D STAGE -->
+  <div class="stage" id="stage">
+    <canvas id="edges"></canvas>
+    <div id="nodes"></div>
   </div>
 
-  <!-- LEGEND -->
   <div class="legend">
     <div class="leg-item"><div class="leg-dot" style="background:var(--saffron);box-shadow:0 0 5px rgba(255,153,51,.6)"></div><span id="leg1">You (glowing)</span></div>
     <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div><span id="leg2">Lineage path</span></div>
@@ -464,22 +434,20 @@ body.lang-te .timeline-text{font-family:'Noto Serif Telugu',serif;font-style:nor
     <div class="leg-item"><div class="leg-dot" style="background:var(--node-border)"></div><span id="leg4">Family node</span></div>
   </div>
 
-  <!-- ZOOM CONTROLS -->
   <div class="zoom-indicator">
     <button class="zoom-btn" id="zoom-in" aria-label="Zoom in">+</button>
-    <div class="zoom-label" id="zoom-label">85%</div>
+    <div class="zoom-label" id="zoom-label">100%</div>
     <button class="zoom-btn" id="zoom-out" aria-label="Zoom out">−</button>
     <button class="zoom-btn" id="zoom-reset" style="font-size:.58rem" aria-label="Fit">FIT</button>
+    <button class="zoom-btn sm" id="btn-tilt" aria-label="Tilt">⤢</button>
+    <button class="zoom-btn sm on" id="btn-auto" aria-label="Auto rotate">⟳</button>
   </div>
 
-  <!-- MODAL -->
   <div id="modal-root"></div>
 
-  <!-- TIMELINE -->
   <div class="timeline-wrap">
     <div class="timeline-track" id="timeline-track"></div>
   </div>
-
 </div>
 
 <script>
@@ -493,7 +461,7 @@ const T = {
     title:'Thota Family Tree', sub:'Thota Vamsham · Six Generations · All Branches',
     btnRelation:'✦ Know Your Relationship', btnExpand:'Expand All',
     btnCollapse:'Collapse All', btnClear:'✕ Clear',
-    hint:'Drag to pan · Scroll/pinch to zoom · +/− expand/collapse',
+    hint:'Drag ◀ ▶ to rotate · ▲ ▼ to slide · Scroll / pinch to zoom · Tap a name to see its bloodline',
     youBarPre:'Showing relationships relative to:', youBarSuf:'· via BFS + LCA',
     leg1:'You (glowing)', leg2:'Lineage path', leg3:'Search hit', leg4:'Family node',
     lastUpdated:'Data last updated:',
@@ -508,12 +476,16 @@ const T = {
     errNotFound:'Name not found. Check spelling or pick your father.',
     errMultiple:'Multiple matches. Please select your father.',
     timeline:'Thota Family Tree created by <b>Venkatesh Thota</b>, S/o <b>Sambaiah Thota</b> &nbsp;✦&nbsp; Thota Vamsham · Six Generations · All Branches Complete',
+    bloodline:'Bloodline', ancestors:'ancestors', descendants:'descendants',
+    childOf:'S/o · D/o', tipAuto:'Auto-rotate', tipTilt:'Change tilt', tipZoomIn:'Zoom in', tipZoomOut:'Zoom out', tipFit:'Fit to screen',
     // Relationship keys → display labels (English)
-    You:'You', Spouse:'Spouse',
+    You:'You', Wife:'Wife', Husband:'Husband', Spouse:'Spouse',
     Father:'Father', Mother:'Mother',
     Son:'Son', Daughter:'Daughter',
     Grandson:'Grandson', Granddaughter:'Granddaughter',
     Grandfather:'Grandfather', Grandmother:'Grandmother',
+    GreatGrandson:'Great-Grandson', GreatGranddaughter:'Great-Granddaughter',
+    GreatGrandfather:'Great-Grandfather', GreatGrandmother:'Great-Grandmother',
     Brother:'Brother', Sister:'Sister',
     Uncle:'Uncle', Aunt:'Aunt',
     Nephew:'Nephew', Niece:'Niece',
@@ -529,52 +501,103 @@ const T = {
   },
   te: {
     title:'థోటా వంశ వృక్షం', sub:'థోటా వంశం · ఆరు తరాలు · అన్ని శాఖలు',
-    btnRelation:'✦ మీ బంధం తెలుసుకోండి', btnExpand:'అన్నీ విప్పండి',
-    btnCollapse:'అన్నీ మూయండి', btnClear:'✕ తీసివేయి',
-    hint:'లాగడానికి డ్రాగ్ చేయండి · జూమ్ కు స్క్రోల్ చేయండి · +/− శాఖలు తెరవండి',
-    youBarPre:'బంధాలు చూపుతున్నారు:', youBarSuf:'· BFS + LCA ద్వారా',
-    leg1:'మీరు (మెరుపు)', leg2:'వంశ మార్గం', leg3:'వెతుకు ఫలితం', leg4:'కుటుంబ సభ్యుడు',
-    lastUpdated:'డేటా చివరిగా నవీకరించబడింది:',
-    searchPlaceholder:'పేరు వెతకండి…',
-    modalTitle:'మీ బంధం తెలుసుకోండి',
-    modalDesc:'చెట్టులో కనిపించే విధంగా మీ పేరు టైప్ చేయండి. ఒకే పేరు అనేక చోట్ల ఉంటే, మీ నాన్న పేరు కూడా ఎంచుకోండి.',
-    labelName:'మీ పేరు', placeholderName:'ఉదా: కుమార్, శ్రీను, వెంకటేశ్…',
-    labelFather:'మీ తండ్రి', labelFatherHint:'(ఐచ్ఛికం — నకళ్ళు తగ్గిస్తుంది)',
+    btnRelation:'✦ మీ బంధుత్వం తెలుసుకోండి', btnExpand:'అన్నీ తెరవండి',
+    btnCollapse:'అన్నీ మూసివేయండి', btnClear:'✕ తొలగించు',
+    hint:'తిప్పడానికి ఎడమ–కుడి లాగండి · పైకి–కిందికి జరపండి · జూమ్ కోసం స్క్రోల్ / పించ్ చేయండి · వంశ క్రమం చూడటానికి పేరును నొక్కండి',
+    youBarPre:'వీరి నుండి బంధుత్వాలు చూపుతున్నాం:', youBarSuf:'· BFS + LCA పద్ధతి',
+    leg1:'మీరు (వెలుగుతో)', leg2:'వంశ క్రమం', leg3:'వెతికిన వ్యక్తి', leg4:'కుటుంబ సభ్యులు',
+    lastUpdated:'సమాచారం నవీకరించిన తేదీ:',
+    searchPlaceholder:'పేరుతో వెతకండి…',
+    modalTitle:'మీ బంధుత్వం తెలుసుకోండి',
+    modalDesc:'చెట్టులో ఉన్నట్లుగానే మీ పేరు టైప్ చేయండి. ఒకే పేరు ఒకటి కంటే ఎక్కువ శాఖల్లో ఉంటే, మీ తండ్రిని కూడా ఎంచుకోండి.',
+    labelName:'మీ పేరు', placeholderName:'ఉదా: కుమార్, శ్రీను, వెంకటేష్…',
+    labelFather:'మీ తండ్రి', labelFatherHint:'(ఐచ్ఛికం — ఒకే పేరు ఉన్నప్పుడు)',
     fatherDefault:'— మీ తండ్రిని ఎంచుకోండి —',
-    btnCancel:'రద్దు చేయి', btnFind:'చెట్టులో నన్ను కనుగొనండి ✦',
+    btnCancel:'రద్దు', btnFind:'చెట్టులో నన్ను చూపించు ✦',
     errNoName:'దయచేసి మీ పేరు నమోదు చేయండి.',
-    errNotFound:'పేరు కనుగొనబడలేదు. స్పెల్లింగ్ తనిఖీ చేయండి.',
-    errMultiple:'అనేక మ్యాచ్‌లు కనుగొనబడ్డాయి. మీ తండ్రిని ఎంచుకోండి.',
-    timeline:'థోటా వంశ వృక్షం నిర్మించారు <b>వెంకటేశ్ థోటా</b>, తండ్రి <b>సంబయ్య థోటా</b> &nbsp;✦&nbsp; థోటా వంశం · ఆరు తరాలు · పూర్తి వంశ వృక్షం',
+    errNotFound:'ఈ పేరు కనబడలేదు. స్పెల్లింగ్ సరిచూడండి లేదా మీ తండ్రిని ఎంచుకోండి.',
+    errMultiple:'ఒకే పేరుతో ఒకరికి మించి ఉన్నారు. దయచేసి మీ తండ్రిని ఎంచుకోండి.',
+    timeline:'థోటా వంశ వృక్షాన్ని రూపొందించినవారు <b>వెంకటేష్ థోటా</b>, <b>సాంబయ్య థోటా</b> కుమారుడు &nbsp;✦&nbsp; థోటా వంశం · ఆరు తరాలు · అన్ని శాఖలూ పూర్తి',
+    bloodline:'వంశ క్రమం', ancestors:'పూర్వీకులు', descendants:'వారసులు',
+    childOf:'సంతానం:', tipAuto:'ఆటో తిరుగుడు', tipTilt:'వంపు మార్చండి', tipZoomIn:'పెద్దది చేయండి', tipZoomOut:'చిన్నది చేయండి', tipFit:'తెరకు సరిచేయండి',
     // Telugu relationship labels
-    You:'మీరు', Spouse:'భార్య/భర్త',
+    You:'మీరు', Wife:'భార్య', Husband:'భర్త', Spouse:'జీవిత భాగస్వామి',
     Father:'నాన్న', Mother:'అమ్మ',
     Son:'కుమారుడు', Daughter:'కుమార్తె',
     Grandson:'మనవడు', Granddaughter:'మనవరాలు',
-    Grandfather:'తాత', Grandmother:'నానమ్మ',
-    Brother:'అన్న/తమ్ముడు', Sister:'అక్క/చెల్లెలు',
-    Uncle:'మామయ్య', Aunt:'అత్తయ్య',
-    Nephew:'మేనల్లుడు', Niece:'మేనకోడలు',
-    GrandUncle:'పెద్ద మామయ్య', GrandAunt:'పెద్ద అత్తయ్య',
-    GrandNephew:'మనవ అల్లుడు', GrandNiece:'మనవ కోడలు',
-    Cousin:'బావ/మరది',
-    FatherInLaw:'మావగారు', MotherInLaw:'అత్తగారు',
+    Grandfather:'తాత', Grandmother:'నాన్నమ్మ / అమ్మమ్మ',
+    GreatGrandson:'ముని మనవడు', GreatGranddaughter:'ముని మనవరాలు',
+    GreatGrandfather:'ముత్తాత', GreatGrandmother:'ముత్తవ్వ',
+    Brother:'అన్న / తమ్ముడు', Sister:'అక్క / చెల్లెలు',
+    Uncle:'బాబాయి / మేనమామ', Aunt:'అత్త / పిన్ని',
+    Nephew:'మేనల్లుడు / అన్నదమ్ముల కొడుకు', Niece:'మేనకోడలు / అన్నదమ్ముల కూతురు',
+    GrandUncle:'పెదతాత / చినతాత', GrandAunt:'తాత సోదరి (పెద్దత్త)',
+    GrandNephew:'తోబుట్టువు మనవడు', GrandNiece:'తోబుట్టువు మనవరాలు',
+    Cousin:'కజిన్ (వరుస సోదరుడు / సోదరి)',
+    FatherInLaw:'మామగారు', MotherInLaw:'అత్తగారు',
     SonInLaw:'అల్లుడు', DaughterInLaw:'కోడలు',
-    BrotherInLaw:'బావమరిది', SisterInLaw:'వదిన/మరదలు',
-    UncleMarriage:'మామయ్య (వివాహం ద్వారా)', AuntMarriage:'అత్తయ్య (వివాహం ద్వారా)',
-    CousinSpouse:'బంధువు జీవిత భాగస్వామి',
-    GranddaughterInLaw:'మనవ కోడలు', GrandsonInLaw:'మనవ అల్లుడు',
+    BrotherInLaw:'బావ / బావమరిది', SisterInLaw:'వదిన / మరదలు',
+    UncleMarriage:'బాబాయి / మామయ్య (వివాహ బంధం)', AuntMarriage:'పిన్ని / అత్తయ్య (వివాహ బంధం)',
+    CousinSpouse:'కజిన్ జీవిత భాగస్వామి',
+    GranddaughterInLaw:'మనవడి భార్య', GrandsonInLaw:'మనవరాలి భర్త',
   }
 };
+
+/* Side-aware Telugu kinship (father's side vs mother's side, brother's vs sister's child) */
+const TE_SIDE = {
+  'Uncle|p':'బాబాయి / పెదనాన్న',  'Uncle|m':'మేనమామ',
+  'Aunt|p':'మేనత్త',               'Aunt|m':'పిన్ని / పెద్దమ్మ',
+  'Grandfather|p':'తాత',            'Grandfather|m':'తాత',
+  'Grandmother|p':'నాన్నమ్మ',       'Grandmother|m':'అమ్మమ్మ',
+  'Nephew|b':'అన్న / తమ్ముడి కొడుకు','Nephew|s':'మేనల్లుడు',
+  'Niece|b':'అన్న / తమ్ముడి కూతురు', 'Niece|s':'మేనకోడలు'
+};
+
+/* Telugu spellings of every name (edit any of these if a spelling should differ) */
+const TE_NAMES = {
+  'Veraiah':'వీరయ్య','Laxminasamma':'లక్ష్మీనరసమ్మ','Kanakaiah':'కనకయ్య','Laxmi':'లక్ష్మి',
+  'Veeraiah':'వీరయ్య','Mallamma':'మల్లమ్మ','Kumar':'కుమార్','Swarupa':'స్వరూప',
+  'Pravalika':'ప్రవళిక','Chandrashekar':'చంద్రశేఖర్','Vikramaditya':'విక్రమాదిత్య','Dhruva':'ధ్రువ',
+  'Pranay':'ప్రణయ్','Srinu':'శ్రీను','Radhika':'రాధిక','Vickey':'విక్కీ','Pranatha':'ప్రణత',
+  'Rajiv':'రాజీవ్','Nikitha':'నికిత','Rakesh':'రాకేష్','Padma':'పద్మ','Vijay Kumar':'విజయ్ కుమార్',
+  'Sravanthi':'స్రవంతి','Alakya':'అలక్య','Rama':'రామ','Raju':'రాజు','Ramprasad':'రామ్\u200cప్రసాద్',
+  'Bhavani':'భవాని','Mallaiah':'మల్లయ్య','Upendra':'ఉపేంద్ర','Rama (Sujatha)':'రామ (సుజాత)',
+  'Thirumal':'తిరుమల్','Sai Teja':'సాయి తేజ','Sai Charan':'సాయి చరణ్','Devaraj':'దేవరాజ్',
+  'Anusha':'అనూష','Swetha':'శ్వేత','Ram Charan':'రామ్ చరణ్','Shoba':'శోభ','Ravi':'రవి',
+  'Mounika':'మౌనిక','Rajesh':'రాజేష్','Nihanshi':'నిహాన్షి','Yeshwik':'యశ్విక్','Prasad':'ప్రసాద్',
+  'Keerthana':'కీర్తన','Komuraiah':'కొమురయ్య','Pramila':'ప్రమీల','Sujatha':'సుజాత',
+  'Satwik':'సాత్విక్','Seshank':'శేషాంక్','Sridhar':'శ్రీధర్','Saritha':'సరిత',
+  'Krishnavihan':'కృష్ణవిహాన్','Anirudh':'అనిరుధ్','Veramallu':'వీరమల్లు','Samakka':'సమక్క',
+  'Veeraswamy':'వీరస్వామి','Komuramma':'కొమురమ్మ','Venkatesh':'వెంకటేష్','Jyothi':'జ్యోతి',
+  'Archith':'అర్చిత్','Ashmitha':'అస్మిత','Chandramuli':'చంద్రమౌళి','Ramya':'రమ్య','Vihan':'విహాన్',
+  'Srikshara':'శ్రీక్షర','Suraiah':'సూరయ్య','Buchamma':'బుచ్చమ్మ','Rajamuli':'రాజమౌళి',
+  'Srilatha':'శ్రీలత','Vivek':'వివేక్','Rahul':'రాహుల్','Krishna':'కృష్ణ','Rashi':'రాశి','Anil':'అనిల్',
+  'Laxminarayana':'లక్ష్మీనారాయణ','Vijaya':'విజయ','Vinay':'వినయ్','Gauthami':'గౌతమి',
+  'Govardhan':'గోవర్ధన్','Kenisha Yuga':'కెనిషా యుగ','Komurelli':'కొమురెల్లి','Savitha':'సవిత',
+  'Sravan Kumar':'శ్రవణ్ కుమార్','Bindhusree':'బిందుశ్రీ','Navya':'నవ్య','Kranthi Kumar':'క్రాంతి కుమార్',
+  'Aarushnandhan':'ఆరుష్\u200cనందన్','Alivela':'అలివేలు','Sampath':'సంపత్','Naveen':'నవీన్',
+  'Rajinikanth':'రజినీకాంత్','Rachana':'రచన','Naresh':'నరేష్','Riyansh':'రియాన్ష్','Ruthvika':'రుత్విక',
+  'Prem':'ప్రేమ్','Dinesh':'దినేష్','Bharath':'భరత్','Narsaiah':'నర్సయ్య','Yellamma':'ఎల్లమ్మ',
+  'Sambaiah':'సాంబయ్య','Yakalaxmi':'యాకలక్ష్మి','Rajkumar':'రాజ్\u200cకుమార్','Manasa':'మానస',
+  'Lashvika':'లాశ్విక','Sambalaxmi':'సాంబలక్ష్మి','Ielaiah':'ఐలయ్య','Sateesh':'సతీష్','Rajitha':'రజిత',
+  'Hasini':'హాసిని','Swapna':'స్వప్న','Rajendhar':'రాజేందర్','Abhilash':'అభిలాష్','Siddhartha':'సిద్ధార్థ',
+  'Sadhaiah':'సదయ్య','Dharshanik':'దర్శనిక్','Chaitra':'చైత్ర','Labanya':'లావణ్య','Nagaraju':'నాగరాజు',
+  'Chabandhi':'చబంధి','Sai':'సాయి','Thansika':'తన్షిక','Nithish':'నితీష్','Akshara':'అక్షర',
+  'Badraiah':'భద్రయ్య','Kamulamma':'కాములమ్మ','Pushpanila':'పుష్పనీల','Sudhakar':'సుధాకర్',
+  'Shivaraj':'శివరాజ్','Laxmiakka':'లక్ష్మక్క','Ielakka':'ఐలక్క','Veeralaxmi':'వీరలక్ష్మి'
+};
+const TE_MONTHS = ['జనవరి','ఫిబ్రవరి','మార్చి','ఏప్రిల్','మే','జూన్','జూలై','ఆగస్టు','సెప్టెంబర్','అక్టోబర్','నవంబర్','డిసెంబర్'];
 
 function t(key){ return T[lang][key] || T.en[key] || key; }
 
 function setLang(l){
   lang = l;
   document.body.classList.toggle('lang-te', l === 'te');
+  document.documentElement.lang = l === 'te' ? 'te' : 'en';
   applyUIStrings();
   if(youId) relMap = buildRelMap(youId);
-  renderToolbar(); renderYouBar(); renderTree(); buildTimeline();
+  renderToolbar(); updateBars(); updateCards(); buildTimeline();
+  document.getElementById('search-suggestions').style.display = 'none';
 }
 
 function applyUIStrings(){
@@ -583,6 +606,8 @@ function applyUIStrings(){
   set('leg1', t('leg1')); set('leg2', t('leg2')); set('leg3', t('leg3')); set('leg4', t('leg4'));
   const si = document.getElementById('search-input');
   if(si) si.placeholder = t('searchPlaceholder');
+  const ttl = (id, k) => { const el=document.getElementById(id); if(el){ el.title=t(k); el.setAttribute('aria-label', t(k)); } };
+  ttl('zoom-in','tipZoomIn'); ttl('zoom-out','tipZoomOut'); ttl('zoom-reset','tipFit'); ttl('btn-tilt','tipTilt'); ttl('btn-auto','tipAuto');
   setLastUpdated();
 }
 
@@ -590,9 +615,17 @@ function setLastUpdated(){
   const el = document.getElementById('last-updated');
   if(!el) return;
   const d = new Date();
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  el.textContent = `${t('lastUpdated')} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  const en = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const mon = lang === 'te' ? TE_MONTHS[d.getMonth()] : en[d.getMonth()];
+  el.textContent = `${t('lastUpdated')} ${d.getDate()} ${mon} ${d.getFullYear()}`;
 }
+
+/** Display name of a person in the current language */
+function nm(pid){
+  const p = G[pid]; if(!p) return '';
+  return lang === 'te' ? (TE_NAMES[p.name] || p.name) : p.name;
+}
+const normName = s => String(s||'').replace(/[\u200c\u200d]/g,'').trim().toLowerCase();
 
 /* ================================================================
    MODULE: FAMILY DATA
@@ -910,7 +943,6 @@ addChildren(P_Veraiah, P_Laxminasamma,
 /* ================================================================
    MODULE: RELATIONSHIP ENGINE — BFS + LCA
 ================================================================ */
-
 /** BFS upward: returns Map<id, depth> for all ancestors */
 function ancestorMap(id){
   const dist = new Map();
@@ -968,66 +1000,76 @@ function getPathToAncestor(id, ancestorId){
   return path;
 }
 
-/** Build the set of IDs on the lineage path between youId and targetId */
-function buildLinagePath(youId, targetId){
-  const lca = findLCA(youId, targetId);
-  if(!lca) return new Set();
-  const pathA = getPathToAncestor(youId, lca.lca);
-  const pathB = getPathToAncestor(targetId, lca.lca);
-  return new Set([...pathA, ...pathB]);
-}
-
 function ordinal(n){ const s=['th','st','nd','rd'],v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
 
-/** Compute relationship key (language-neutral) between youId → targetId */
-function computeRelKey(youId, targetId){
+const baseKey = k => (k || '').split('|')[0];
+const greats  = k => k <= 2 ? 'Great-'.repeat(k) : `${k}× Great-`;
+
+/** Compute relationship key (language-neutral) between youId → targetId.
+    Suffixes: |p / |m = via father's / mother's side, |b / |s = via brother / sister */
+function computeRelKey(youId, targetId, seen){
   if(!youId || !targetId) return null;
   if(youId === targetId) return 'You';
   const you = G[youId], tgt = G[targetId];
   if(!you || !tgt) return null;
+  seen = seen || new Set();
+  if(seen.has(targetId)) return null;          // guards the in-law recursion
+  seen.add(targetId);
   const f = tgt.gender === 'f';
 
-  if(you.spouseId === targetId) return 'Spouse';
+  if(you.spouseId === targetId) return f ? 'Wife' : 'Husband';
 
   const lca = findLCA(youId, targetId);
 
   if(!lca){
-    // Check in-law via spouse of blood relative
+    // a) target is the spouse of someone related to you
     const partner = Object.values(G).find(p => p.spouseId === targetId);
     if(partner){
-      const pRel = computeRelKey(youId, partner.id); if(!pRel) return null;
+      const pRel = baseKey(computeRelKey(youId, partner.id, seen));
       if(pRel==='Father'||pRel==='Mother')           return f?'MotherInLaw':'FatherInLaw';
       if(pRel==='Son'||pRel==='Daughter')             return f?'DaughterInLaw':'SonInLaw';
       if(pRel==='Brother'||pRel==='Sister')           return f?'SisterInLaw':'BrotherInLaw';
       if(pRel==='Uncle'||pRel==='Aunt')               return f?'AuntMarriage':'UncleMarriage';
-      if(pRel&&pRel.includes('Cousin'))               return 'CousinSpouse';
+      if(pRel && pRel.includes('Cousin'))             return 'CousinSpouse';
       if(pRel==='Grandson'||pRel==='Granddaughter')   return f?'GranddaughterInLaw':'GrandsonInLaw';
-      return null;
+    }
+    // b) you married into the family: read the relation through your spouse
+    if(you.spouseId && !seen.has('__viaSpouse')){
+      const sRel = baseKey(computeRelKey(you.spouseId, targetId, new Set(['__viaSpouse'])));
+      if(sRel==='Father')  return 'FatherInLaw';
+      if(sRel==='Mother')  return 'MotherInLaw';
+      if(sRel==='Brother') return 'BrotherInLaw';
+      if(sRel==='Sister')  return 'SisterInLaw';
     }
     return null;
   }
 
   const { dA, dB } = lca;
+  const sideOf = () => { const path = getPathToAncestor(youId, lca.lca); return (G[path[1]] && G[path[1]].gender === 'f') ? '|m' : '|p'; };
 
-  if(dA===0){
+  if(dA===0){                                   // target is your descendant
     if(dB===1) return f?'Daughter':'Son';
     if(dB===2) return f?'Granddaughter':'Grandson';
     if(dB===3) return f?'GreatGranddaughter':'GreatGrandson';
-    return `${dB-1}xGGrand_${f?'d':'s'}`;
+    return `Desc_${dB}_${f?'d':'s'}`;
   }
-  if(dB===0){
+  if(dB===0){                                   // target is your ancestor
     if(dA===1) return f?'Mother':'Father';
-    if(dA===2) return f?'Grandmother':'Grandfather';
+    if(dA===2) return (f?'Grandmother':'Grandfather') + sideOf();
     if(dA===3) return f?'GreatGrandmother':'GreatGrandfather';
-    return `${dA-1}xGGrand_${f?'m':'f'}`;
+    return `Anc_${dA}_${f?'m':'f'}`;
   }
   if(dA===1&&dB===1) return f?'Sister':'Brother';
-  if(dA===2&&dB===1) return f?'Aunt':'Uncle';
-  if(dA===1&&dB===2) return f?'Niece':'Nephew';
+  if(dA===2&&dB===1) return (f?'Aunt':'Uncle') + sideOf();
+  if(dA===1&&dB===2){
+    const pathB = getPathToAncestor(targetId, lca.lca);
+    const sib = G[pathB[1]];
+    return (f?'Niece':'Nephew') + (sib && sib.gender==='f' ? '|s' : '|b');
+  }
   if(dA===3&&dB===1) return f?'GrandAunt':'GrandUncle';
   if(dA===1&&dB===3) return f?'GrandNiece':'GrandNephew';
-  if(dA>=4&&dB===1)  return f?`GrGrandAunt_${dA-2}`:`GrGrandUncle_${dA-2}`;
-  if(dA===1&&dB>=4)  return f?`GrGrandNiece_${dB-2}`:`GrGrandNephew_${dB-2}`;
+  if(dA>=4&&dB===1)  return `GU_${dA-3}_${f?'a':'u'}`;
+  if(dA===1&&dB>=4)  return `GN_${dB-3}_${f?'a':'u'}`;
   if(dA===dB){ const n=dA-1; return n===1?'Cousin':`Cousin${n}`; }
   const minD=Math.min(dA,dB), removed=Math.abs(dA-dB), n=minD-1;
   return `Cousin${n>1?n:'1'}_rem${removed}`;
@@ -1036,40 +1078,37 @@ function computeRelKey(youId, targetId){
 /** Translate a relationship key to display string in current language */
 function relLabel(key){
   if(!key) return '';
-  // Compound keys for extended relations
-  if(key.includes('xGGrand_')){
-    const [gen, gender] = key.split('xGGrand_');
-    const n = parseInt(gen);
-    if(lang==='te'){
-      const gn = gender==='d'?'మనవరాలు':gender==='s'?'మనవడు':gender==='m'?'నానమ్మ':'తాత';
-      return `${n}వ తరం ${gn}`;
+  const te = lang === 'te';
+  let m;
+  if((m = key.match(/^(Anc|Desc)_(\d+)_([a-z])$/))){
+    const d = parseInt(m[2]);
+    if(m[1]==='Anc'){
+      return te ? `${d}వ తరం పూర్వీకులు`
+                : greats(d-2) + (m[3]==='m' ? 'Grandmother' : 'Grandfather');
     }
-    const gn = gender==='d'?'Granddaughter':gender==='s'?'Grandson':gender==='m'?'Grandmother':'Grandfather';
-    return `${n}× Great-${gn}`;
+    return te ? `${d}వ తరం వారసులు`
+              : greats(d-2) + (m[3]==='d' ? 'Granddaughter' : 'Grandson');
   }
-  if(key.startsWith('GrGrand')){
-    const m = key.match(/^GrGrand(Uncle|Aunt|Nephew|Niece)_(\d+)$/);
-    if(m){
-      const label = m[1]==='Uncle'?t('GrandUncle'):m[1]==='Aunt'?t('GrandAunt'):m[1]==='Nephew'?t('GrandNephew'):t('GrandNiece');
-      return lang==='te'?`${m[2]}వ తరం ${label}`:`${m[2]}× Great-${m[1]}`;
-    }
+  if((m = key.match(/^(GU|GN)_(\d+)_([au])$/))){
+    const k = parseInt(m[2]), a = m[3]==='a';
+    if(m[1]==='GU') return te ? `${t(a?'GrandAunt':'GrandUncle')} (${k} తరం పైన)` : greats(k)+(a?'Grand-Aunt':'Grand-Uncle');
+    return te ? `${t(a?'GrandNiece':'GrandNephew')} (${k} తరం కింద)` : greats(k)+(a?'Grand-Niece':'Grand-Nephew');
   }
   if(key.startsWith('Cousin')){
     const remM = key.match(/^Cousin(\d*)_rem(\d+)$/);
     if(remM){
-      const n = parseInt(remM[1])||1;
-      const r = parseInt(remM[2]);
-      const base = t('Cousin');
-      return lang==='te'?`${base} (${r} తరం దూరం)`:`${ordinal(n)} Cousin (${r}× removed)`;
+      const n = parseInt(remM[1])||1, r = parseInt(remM[2]);
+      return te ? `${n}వ కజిన్ (${r} తరం తేడా)` : `${ordinal(n)} Cousin (${r}× removed)`;
     }
     const nM = key.match(/^Cousin(\d+)$/);
-    if(nM){ const n=parseInt(nM[1]); return lang==='te'?`${t('Cousin')} (${n}వ)`:`${ordinal(n)} Cousin`; }
+    if(nM){ const n = parseInt(nM[1]); return te ? `${n}వ కజిన్` : `${ordinal(n)} Cousin`; }
     return t('Cousin');
   }
-  return t(key) || key;
+  if(te && TE_SIDE[key]) return TE_SIDE[key];
+  return t(baseKey(key));
 }
 
-/** Build full relMap: id → display string */
+/** Build full relMap: id → relationship key */
 function buildRelMap(youId){
   const map = {};
   Object.keys(G).forEach(id => {
@@ -1082,232 +1121,511 @@ function buildRelMap(youId){
 /* ================================================================
    MODULE: STATE
 ================================================================ */
-let youId       = null;   // selected "you" person ID
-let relMap      = {};     // id → relationship key
-let collapsed   = {};     // id → true if collapsed
-let pathSet     = new Set(); // IDs on lineage path
-let searchHitId = null;   // single search result ID
-let dimMode     = false;  // true when lineage path dimming is active
+let youId       = null;      // selected "you" person ID
+let relMap      = {};        // id → relationship key
+let collapsed   = {};        // id → true if collapsed
+let pathSet     = new Set(); // IDs on the bloodline
+let searchHitId = null;      // single search result / clicked person
+let dimMode     = false;     // true while a bloodline is highlighted
+let bloodId     = null;      // person whose bloodline is shown
+let bloodStats  = {anc:0, desc:0};
 
 /* ================================================================
-   MODULE: TREE RENDERER
+   MODULE: 3D TREE MODEL (units = person + spouse)
 ================================================================ */
+const ROOT = P_Veraiah;
+const U = {};        // unit id → unit  (unit id = the blood-line person's id)
+const BLOOD = new Set();
+const unitOf = {};   // any person id → unit id
+const RSTEP = 280, YSTEP = 125, TAU = Math.PI*2, CAMZ = 6500, PITCH0 = 0.15;
+let maxD = 0;
 
-/** Determine CSS classes for a node box */
-function nodeBoxClass(id){
-  let cls = 'node-box';
-  if(id === youId)       cls += ' is-you';
-  if(id === searchHitId) cls += ' search-hit';
-  if(pathSet.has(id) && id !== youId) cls += ' on-path';
-  if(dimMode && !pathSet.has(id) && id !== youId && id !== searchHitId) cls += ' dimmed';
-  return cls;
-}
+(function buildUnits(){
+  (function walk(id, parent, depth){
+    const p = G[id];
+    BLOOD.add(id);
+    U[id] = { id, sp:p.spouseId||null, parent, kids:[], depth, t:null, cur:null, alpha:0, shown:true, el:null, dim:false };
+    unitOf[id] = id; if(p.spouseId) unitOf[p.spouseId] = id;
+    (p.childrenIds||[]).forEach(c => { if(G[c]){ U[id].kids.push(c); walk(c, U[id], depth+1); } });
+  })(ROOT, null, 0);
+})();
 
-/** Connector line class (animated when on lineage path) */
-function vConnClass(childId){
-  if(pathSet.size > 0){
-    const p = G[childId];
-    if(p && (pathSet.has(childId) || pathSet.has(p.fatherId) || pathSet.has(p.motherId)))
-      return 'v-conn path-conn';
-  }
-  return 'v-conn';
-}
+function kidsVis(u){ return collapsed[u.id] ? [] : u.kids.map(k => U[k]); }
+function wt(u){ const ks = kidsVis(u); return ks.length ? ks.reduce((s,k) => s + wt(k), 0) : 1; }
 
-function renderNodeHTML(id){
-  const p = G[id]; if(!p) return '';
-  const isYou    = id === youId;
-  const relKey   = relMap[id] || null;
-  const relDisp  = relKey ? relLabel(relKey) : '';
-
-  const nameCls = 'node-name' + (isYou ? ' you-nm' : '');
-  const relCls  = 'node-rel'  + (isYou ? ' rel-you' : '');
-
-  // Build the primary node box
-  let nodeInner = `
-    <div class="${nodeBoxClass(id)}" data-id="${id}" onclick="nodeClick('${id}')">
-      <span class="${nameCls}">${p.name}</span>
-      ${relDisp ? `<span class="${relCls}">${relDisp}</span>` : ''}
-    </div>`;
-
-  // Spouse box
-  let couple = `<div class="couple-wrap">${nodeInner}`;
-  if(p.spouseId && G[p.spouseId]){
-    const sp = G[p.spouseId];
-    const spRelKey  = relMap[p.spouseId] || null;
-    const spRelDisp = spRelKey ? relLabel(spRelKey) : '';
-    const spIsYou   = p.spouseId === youId;
-    const spNameCls = 'node-name' + (spIsYou ? ' you-nm' : '');
-    const spRelCls  = 'node-rel'  + (spIsYou ? ' rel-you' : '');
-    couple += `
-      <div class="sp-line"></div>
-      <div class="${nodeBoxClass(p.spouseId)}" data-id="${p.spouseId}" onclick="nodeClick('${p.spouseId}')">
-        <span class="${spNameCls}">${sp.name}</span>
-        ${spRelDisp ? `<span class="${spRelCls}">${spRelDisp}</span>` : ''}
-      </div>`;
-  }
-  couple += '</div>';
-
-  // Children area
-  const hasChildren = p.childrenIds && p.childrenIds.length > 0;
-  const isColl = collapsed[id];
-  let childHTML = '';
-  if(hasChildren){
-    childHTML = `<div class="ch-area">
-      <div class="${vConnClass(id)}" style="height:10px"></div>
-      <div class="tog" onclick="togNode(event,'${id}')">${isColl ? '+' : '&minus;'}</div>`;
-    if(!isColl){
-      childHTML += `<div class="${vConnClass(id)}" style="height:8px"></div>`;
-      childHTML += renderChildrenRow(p.childrenIds);
+/** Cone layout: every branch gets an angular sector sized by how many people it holds. */
+function relayout(){
+  let idx = 0; maxD = 0;
+  function hide(u, pt){ u.shown = false; u.t = {r:pt.r, th:pt.th, y:pt.y}; u.kids.forEach(k => hide(U[k], pt)); }
+  function place(u, a0, a1){
+    u.shown = true;
+    const th = (a0+a1)/2;
+    const jitter = u.depth ? ((idx++ % 3) - 1) * 34 : 0;   // stagger neighbours so cards don't overlap
+    u.t = { r:u.depth*RSTEP, th, y:u.depth*YSTEP + jitter };
+    maxD = Math.max(maxD, u.depth);
+    const ks = kidsVis(u);
+    if(ks.length){
+      const tot = ks.reduce((s,k) => s + wt(k), 0);
+      let a = a0;
+      ks.forEach(k => { const w = wt(k)/tot*(a1-a0); place(k, a, a+w); a += w; });
     }
-    childHTML += '</div>';
+    if(collapsed[u.id]) u.kids.forEach(k => hide(U[k], u.t));
   }
-  return `<div class="p-col">${couple}${childHTML}</div>`;
+  place(U[ROOT], 0, TAU);
+  tgt.cy = (maxD*YSTEP)/2;
+  Object.values(U).forEach(u => { if(!u.cur) u.cur = {r:0, th:u.t.th, y:0}; });
+  markDirty();
 }
 
-function renderChildrenRow(ids){
-  const valid = ids.filter(id => G[id]);
-  if(!valid.length) return '';
+/* ================================================================
+   MODULE: CAMERA + PROJECTION
+================================================================ */
+const cam = { yaw:-0.9, pitch:PITCH0, zoom:0.3, panX:0, panY:0, cy:300 };
+const tgt = { yaw:0,    pitch:PITCH0, zoom:0.6, panX:0, panY:0, cy:300 };
+let W = 800, H = 600, dpr = 1;
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 
-  // Determine if this h-bar should be path-highlighted
-  const anyOnPath = valid.some(id => pathSet.has(id));
-  const barCls = anyOnPath && pathSet.size > 0 ? 'h-bar-connector path-h' : 'h-bar-connector';
-
-  const cols = valid.map(cid => {
-    const connCls = vConnClass(cid);
-    return `<div class="ch-col">
-      <div class="${connCls}" style="height:12px"></div>
-      ${renderNodeHTML(cid)}
-    </div>`;
-  }).join('');
-
-  const bar = valid.length > 1
-    ? `<div class="${barCls}" style="left:calc(50% - ${(valid.length*0.5-0.5)*80}px);width:calc(100% - 90px)"></div>`
-    : '';
-
-  return `<div class="ch-row">${bar}${cols}</div>`;
+function project(r, th, y, c){
+  const x = r*Math.sin(th), z = r*Math.cos(th), yy = y - c.cy;
+  const cyw = Math.cos(c.yaw), syw = Math.sin(c.yaw);
+  const x1 = x*cyw + z*syw, z1 = -x*syw + z*cyw;
+  const cp = Math.cos(c.pitch), sp = Math.sin(c.pitch);
+  const y2 = yy*cp + z1*sp, z2 = -yy*sp + z1*cp;
+  const s = CAMZ/(CAMZ - z2);
+  return { sx: W/2 + c.panX + x1*s*c.zoom, sy: H/2 + c.panY + y2*s*c.zoom, z:z2, s:s*c.zoom };
 }
 
-function renderTree(){
-  const canvas = document.getElementById('tree-canvas');
-  if(canvas) canvas.innerHTML = renderNodeHTML(P_Veraiah);
+/** Size the model to the screen using its real projected extent (sampled over a full turn) */
+function modelFit(pitch){
+  const xs = [], ys = [], cy = (maxD*YSTEP)/2;
+  const vis = Object.values(U).filter(u => u.shown);
+  for(let k = 0; k < 12; k++){
+    const c = { yaw:k*Math.PI/6, pitch, zoom:1, panX:0, panY:0, cy };
+    vis.forEach(u => { const p = project(u.t.r, u.t.th, u.t.y, c); xs.push(Math.abs(p.sx - W/2)); ys.push(p.sy - H/2); });
+  }
+  xs.sort((a,b) => a-b); ys.sort((a,b) => a-b);
+  const at = (a,q) => a[Math.floor(q*(a.length-1))];
+  const px = Math.max(at(xs,0.9), 70), lo = at(ys,0.04), hi = at(ys,0.96);
+  const zoom = clamp(Math.min(W*0.96/(2*px), H*0.94/Math.max(hi-lo, 120)), W < 700 ? 0.42 : 0.3, 1.1);
+  return { zoom, panY: -(lo+hi)/2*zoom };
 }
+function fitView(){
+  const f = modelFit(PITCH0);
+  tgt.zoom = f.zoom; tgt.panX = 0; tgt.panY = f.panY; tgt.pitch = PITCH0; markDirty();
+}
+
+/** Rotate the whole tree so a person's card faces you, centre it, and zoom in a little */
+function focusUnit(uid){
+  const u = U[uid]; if(!u || !u.t) return;
+  let ty = -u.t.th; ty += Math.round((cam.yaw - ty)/TAU)*TAU;   // shortest way round
+  tgt.yaw = ty;
+  tgt.pitch = 0.2;
+  tgt.zoom = clamp(0.95*(CAMZ - u.t.r*0.95)/CAMZ, 0.5, 0.85);
+  const p = project(u.t.r, u.t.th, u.t.y, { yaw:tgt.yaw, pitch:tgt.pitch, zoom:tgt.zoom, panX:0, panY:0, cy:tgt.cy });
+  tgt.panX = -(p.sx - W/2); tgt.panY = -(p.sy - H/2) + H*0.1;   // keep the ancestors above in view
+  setAuto(false); markDirty();
+}
+function focusPerson(pid){ focusUnit(unitOf[pid]); }
+
+/* ================================================================
+   MODULE: CARDS (DOM)
+================================================================ */
+const nodesEl = document.getElementById('nodes');
+const stageEl = document.getElementById('stage');
+
+function buildCards(){
+  Object.values(U).forEach(u => {
+    const el = document.createElement('div');
+    el.className = 'u-card'; el.dataset.uid = u.id;
+    nodesEl.appendChild(el); u.el = el;
+  });
+}
+function rowCls(pid){
+  let c = 'u-row';
+  if(pid === youId) c += ' is-you';
+  if(pid === searchHitId) c += ' search-hit';
+  if(pathSet.has(pid) && pid !== youId) c += ' on-path';
+  return c;
+}
+function rowHTML(pid){
+  const key = relMap[pid];
+  const rel = key ? relLabel(key) : '';
+  const isYou = pid === youId;
+  return `<div class="${rowCls(pid)}" data-pid="${pid}"><span class="u-name${isYou?' you-nm':''}">${nm(pid)}</span>${rel?`<span class="u-rel${isYou?' rel-you':''}">${rel}</span>`:''}</div>`;
+}
+function updateCards(){
+  Object.values(U).forEach(u => {
+    const ids = u.sp ? [u.id, u.sp] : [u.id];
+    const onPath = ids.some(i => pathSet.has(i));
+    u.dim = dimMode && !ids.some(i => pathSet.has(i) || i === youId || i === searchHitId);
+    u.hot = onPath || ids.includes(youId) || ids.includes(searchHitId);
+    u.el.className = 'u-card' + (onPath?' on-path':'') + (ids.includes(youId)?' has-you':'') +
+                     (ids.includes(searchHitId)?' has-hit':'') + (u.dim?' dimmed':'');
+    u.el.innerHTML = ids.map(rowHTML).join('') +
+      (u.kids.length ? `<div class="u-tog" data-tog="${u.id}">${collapsed[u.id]?'+':'&minus;'}</div>` : '');
+  });
+  markDirty();
+}
+
+let dragDist = 0;
+nodesEl.addEventListener('click', e => {
+  if(dragDist > 6) return;
+  const tog = e.target.closest('[data-tog]');
+  if(tog){ togNode(tog.dataset.tog); return; }
+  const row = e.target.closest('[data-pid]');
+  if(row) selectPerson(row.dataset.pid);
+});
+
+/* ================================================================
+   MODULE: BLOODLINE
+================================================================ */
+function kidsOwner(id){
+  const p = G[id];
+  if(p.childrenIds && p.childrenIds.length) return id;
+  return (p.spouseId && G[p.spouseId].childrenIds && G[p.spouseId].childrenIds.length) ? p.spouseId : id;
+}
+
+/** ancestors + descendants + their spouses = the person's bloodline */
+function computeBloodline(pid){
+  const s = new Set([pid]);
+  const anc = ancestorMap(pid);
+  anc.forEach((d, id) => s.add(id));
+  let descCount = 0;
+  (function addDesc(id){
+    const p = G[id]; if(!p || !p.childrenIds) return;
+    p.childrenIds.forEach(c => { s.add(c); descCount++; addDesc(c); });
+  })(kidsOwner(pid));
+  const extras = [];
+  s.forEach(id => { if(G[id] && G[id].spouseId) extras.push(G[id].spouseId); });
+  extras.forEach(id => s.add(id));
+  pathSet = s; dimMode = true; bloodId = pid;
+  bloodStats = { anc: anc.size - 1, desc: descCount };
+}
+
+/** chain of people from the family root down to this person */
+function chainOf(pid){
+  const out = []; let cur = pid, guard = 0;
+  while(cur && guard++ < 30){
+    out.unshift(cur);
+    const p = G[cur]; let nxt = null;
+    if(p.fatherId && BLOOD.has(p.fatherId)) nxt = p.fatherId;
+    else if(p.motherId && BLOOD.has(p.motherId)) nxt = p.motherId;
+    else if(!BLOOD.has(cur) && p.spouseId && BLOOD.has(p.spouseId)) nxt = p.spouseId;
+    cur = nxt;
+  }
+  return out;
+}
+
+function expandFor(pid){
+  const uid = unitOf[pid]; if(!uid) return;
+  let u = U[uid];
+  while(u.parent){ collapsed[u.parent.id] = false; u = u.parent; }
+  (function ex(x){ collapsed[x.id] = false; x.kids.forEach(k => ex(U[k])); })(U[uid]);
+}
+
+/** Pick a person: highlight, show bloodline, rotate the tree to face them */
+function selectPerson(pid, force){
+  if(!G[pid]) return;
+  if(!force && searchHitId === pid){ clearSelection(); return; }   // tap again to release
+  searchHitId = pid;
+  computeBloodline(pid);
+  expandFor(pid);
+  relayout(); updateCards(); updateBars();
+  focusUnit(unitOf[pid]);
+}
+
+/** Drop the highlighted person; fall back to "you" bloodline if one is set */
+function clearSelection(){
+  searchHitId = null;
+  if(youId){ computeBloodline(youId); }
+  else { pathSet = new Set(); dimMode = false; bloodId = null; }
+  updateCards(); updateBars(); fitView();
+}
+
+function updateBars(){
+  const bar = document.getElementById('you-bar'); if(!bar) return;
+  if(!youId && !bloodId){ bar.style.display = 'none'; bar.innerHTML = ''; return; }
+  let html = '';
+  if(youId) html += `<div>${t('youBarPre')} <b>${nm(youId)}</b> &nbsp;${t('youBarSuf')}</div>`;
+  if(bloodId){
+    const chain = chainOf(bloodId);
+    html += `<div class="yb-chain"><span style="opacity:.75;font-size:.68rem">${t('bloodline')}:</span>` +
+      chain.map((id,i) => (i?'<span class="chip-arrow">›</span>':'') +
+        `<span class="chip${i===chain.length-1?' last':''}" onclick="focusPerson('${id}')">${nm(id)}</span>`).join('') + `</div>`;
+    html += `<div class="yb-stats">${bloodStats.anc} ${t('ancestors')} · ${bloodStats.desc} ${t('descendants')}</div>`;
+  }
+  bar.innerHTML = html; bar.style.display = 'block';
+}
+
+/* ================================================================
+   MODULE: RENDER LOOP (cards + branches)
+================================================================ */
+const canvas = document.getElementById('edges');
+const ctx = canvas.getContext('2d');
+let dirty = true, autoRot = true, dragging = false, lastT = performance.now();
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduceMotion) autoRot = false;
+function markDirty(){ dirty = true; }
+
+function resize(){
+  W = stageEl.clientWidth; H = stageEl.clientHeight;
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(W*dpr); canvas.height = Math.round(H*dpr);
+  markDirty();
+}
+if(window.ResizeObserver) new ResizeObserver(resize).observe(stageEl);
+window.addEventListener('resize', resize);
+
+function setAuto(on){
+  autoRot = on && !reduceMotion;
+  const b = document.getElementById('btn-auto'); if(b) b.classList.toggle('on', autoRot);
+}
+
+function drawRings(){
+  ctx.setLineDash([4, 9]); ctx.lineWidth = 1;
+  for(let d = 1; d <= maxD; d++){
+    ctx.beginPath();
+    for(let i = 0; i <= 72; i++){
+      const p = project(d*RSTEP, i/72*TAU, d*YSTEP, cam);
+      i ? ctx.lineTo(p.sx, p.sy) : ctx.moveTo(p.sx, p.sy);
+    }
+    ctx.strokeStyle = 'rgba(212,175,55,0.09)'; ctx.stroke();
+  }
+  ctx.setLineDash([]);
+}
+
+function drawEdges(now){
+  const R = Math.max(maxD*RSTEP, 1);
+  const hasPath = pathSet.size > 0;
+  const flow = hasPath && !reduceMotion;
+  Object.values(U).forEach(u => {
+    const pu = u.parent; if(!pu || u.alpha < 0.03) return;
+    const N = 10, pts = [];
+    for(let i = 0; i <= N; i++){
+      const tt = i/N, e = tt*tt*(3-2*tt);
+      pts.push(project(pu.cur.r + (u.cur.r-pu.cur.r)*tt, pu.cur.th + (u.cur.th-pu.cur.th)*e, pu.cur.y + (u.cur.y-pu.cur.y)*e, cam));
+    }
+    const mid = pts[N>>1];
+    const dn = clamp((mid.z + R)/(2*R), 0, 1);
+    const onP = hasPath && pathSet.has(u.id) && pathSet.has(pu.id);
+    ctx.beginPath();
+    pts.forEach((p,i) => i ? ctx.lineTo(p.sx, p.sy) : ctx.moveTo(p.sx, p.sy));
+    if(onP){
+      ctx.shadowColor = 'rgba(255,215,0,0.9)'; ctx.shadowBlur = 12;
+      ctx.strokeStyle = `rgba(255,215,0,${0.6+0.4*dn})`; ctx.lineWidth = Math.max(2, 3.6*mid.s);
+      ctx.stroke(); ctx.shadowBlur = 0;
+      if(flow){
+        ctx.setLineDash([10, 16]); ctx.lineDashOffset = -(now/35) % 26;
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = Math.max(1, 1.4*mid.s); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    } else {
+      let a = (0.2 + 0.5*dn) * u.alpha;
+      if(dimMode) a *= 0.14;
+      ctx.strokeStyle = `rgba(212,175,55,${a.toFixed(3)})`;
+      ctx.lineWidth = Math.max(0.7, 1.6*mid.s); ctx.stroke();
+    }
+  });
+}
+
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt = Math.min(50, now - lastT); lastT = now;
+  if(autoRot && !dragging) tgt.yaw += dt*0.00011;
+
+  let moving = false;
+  const kc = dragging ? 0.4 : 0.13;
+  for(const k of ['yaw','pitch','zoom','panX','panY','cy']){
+    const d = tgt[k] - cam[k];
+    const eps = (k==='panX'||k==='panY'||k==='cy') ? 0.05 : 0.0002;
+    if(Math.abs(d) > eps){ cam[k] += d*kc; moving = true; } else if(d !== 0){ cam[k] = tgt[k]; moving = true; }
+  }
+  Object.values(U).forEach(u => {
+    const c = u.cur, tt = u.t;
+    const dr = tt.r-c.r, dth = tt.th-c.th, dy = tt.y-c.y;
+    if(Math.abs(dr)>0.1 || Math.abs(dth)>0.0005 || Math.abs(dy)>0.1){ c.r += dr*0.11; c.th += dth*0.11; c.y += dy*0.11; moving = true; }
+    else { c.r = tt.r; c.th = tt.th; c.y = tt.y; }
+    const ta = u.shown ? 1 : 0, da = ta - u.alpha;
+    if(Math.abs(da) > 0.004){ u.alpha += da*0.14; moving = true; } else u.alpha = ta;
+  });
+
+  const animating = moving || dirty || autoRot || (pathSet.size > 0 && !reduceMotion);
+  if(!animating) return;
+  dirty = false;
+
+  // ---- cards ----
+  const R = Math.max(maxD*RSTEP, 1);
+  Object.values(U).forEach(u => {
+    const el = u.el;
+    if(u.alpha < 0.02){ if(el.style.display !== 'none') el.style.display = 'none'; return; }
+    const p = project(u.cur.r, u.cur.th, u.cur.y, cam);
+    const dn = clamp((p.z + R)/(2*R), 0, 1);
+    let op = 0.34 + 0.66*Math.pow(dn, 0.8);
+    if(u.hot) op = Math.max(op, 0.92);
+    if(u.dim) op *= 0.2;
+    const k = clamp(p.s, 0.26, 2.4);
+    el.style.display = 'block';
+    el.style.transform = `translate(${p.sx.toFixed(1)}px,${p.sy.toFixed(1)}px) translate(-50%,-50%) scale(${k.toFixed(3)})`;
+    el.style.zIndex = Math.round(3000 + p.z);
+    el.style.opacity = (op*u.alpha).toFixed(3);
+  });
+
+  // ---- branches ----
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  drawRings();
+  drawEdges(now);
+
+  const lbl = document.getElementById('zoom-label');
+  if(lbl) lbl.textContent = Math.round(cam.zoom*100) + '%';
+}
+
+/* ================================================================
+   MODULE: INTERACTION — rotate / slide / zoom
+================================================================ */
+const ptrs = new Map();
+let lastPinch = 0, lastMid = null, vel = 0, lastMoveT = 0;
+
+function zoomAt(mx, my, factor){
+  const nz = clamp(tgt.zoom*factor, 0.2, 3), r = nz/tgt.zoom;
+  const cx = mx - W/2, cy = my - H/2;
+  tgt.panX = cx - (cx - tgt.panX)*r; tgt.panY = cy - (cy - tgt.panY)*r;
+  tgt.zoom = nz; markDirty();
+}
+
+stageEl.addEventListener('pointerdown', e => {
+  if(e.pointerType === 'mouse' && e.button !== 0 && e.button !== 2) return;
+  ptrs.set(e.pointerId, { x:e.clientX, y:e.clientY });
+  dragDist = 0; vel = 0; dragging = true; setAuto(false);
+  stageEl.classList.add('dragging');
+  if(ptrs.size === 2){
+    const [a,b] = [...ptrs.values()];
+    lastPinch = Math.hypot(a.x-b.x, a.y-b.y); lastMid = { x:(a.x+b.x)/2, y:(a.y+b.y)/2 };
+  }
+});
+window.addEventListener('pointermove', e => {
+  const p = ptrs.get(e.pointerId); if(!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  dragDist += Math.abs(dx) + Math.abs(dy);
+  if(ptrs.size === 1){
+    if(e.shiftKey || (e.buttons & 2)){ tgt.panX += dx; tgt.panY += dy; }
+    else { tgt.yaw += dx*0.0075; tgt.panY += dy; vel = dx*0.0075; lastMoveT = performance.now(); }
+  } else if(ptrs.size === 2){
+    const [a,b] = [...ptrs.values()];
+    const d = Math.hypot(a.x-b.x, a.y-b.y), mid = { x:(a.x+b.x)/2, y:(a.y+b.y)/2 };
+    const rect = stageEl.getBoundingClientRect();
+    if(lastPinch) zoomAt(mid.x - rect.left, mid.y - rect.top, d/lastPinch);
+    if(lastMid){ tgt.panX += mid.x - lastMid.x; tgt.panY += mid.y - lastMid.y; }
+    lastPinch = d; lastMid = mid;
+  }
+  markDirty();
+});
+function endPointer(e){
+  if(!ptrs.has(e.pointerId)) return;
+  ptrs.delete(e.pointerId);
+  if(ptrs.size < 2){ lastPinch = 0; lastMid = null; }
+  if(ptrs.size === 0){
+    dragging = false; stageEl.classList.remove('dragging');
+    if(performance.now() - lastMoveT < 80 && Math.abs(vel) > 0.002) tgt.yaw += vel*4;   // a little momentum
+  }
+}
+window.addEventListener('pointerup', endPointer);
+window.addEventListener('pointercancel', endPointer);
+stageEl.addEventListener('contextmenu', e => e.preventDefault());
+stageEl.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = stageEl.getBoundingClientRect();
+  zoomAt(e.clientX - rect.left, e.clientY - rect.top, e.deltaY > 0 ? 0.9 : 1.1);
+  setAuto(false);
+}, { passive:false });
+
+document.addEventListener('keydown', e => {
+  const tag = (document.activeElement && document.activeElement.tagName) || '';
+  if(tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  if(document.getElementById('moverlay')) return;
+  if(e.key === 'ArrowLeft'){ tgt.yaw -= 0.22; setAuto(false); }
+  else if(e.key === 'ArrowRight'){ tgt.yaw += 0.22; setAuto(false); }
+  else if(e.key === 'ArrowUp'){ tgt.panY += 50; }
+  else if(e.key === 'ArrowDown'){ tgt.panY -= 50; }
+  else if(e.key === '+' || e.key === '='){ zoomAt(W/2, H/2, 1.2); }
+  else if(e.key === '-'){ zoomAt(W/2, H/2, 1/1.2); }
+  else return;
+  e.preventDefault(); markDirty();
+});
+
+document.getElementById('zoom-in').onclick    = () => zoomAt(W/2, H/2, 1.25);
+document.getElementById('zoom-out').onclick   = () => zoomAt(W/2, H/2, 1/1.25);
+document.getElementById('zoom-reset').onclick = () => fitView();
+document.getElementById('btn-auto').onclick   = () => setAuto(!autoRot);
+document.getElementById('btn-tilt').onclick   = () => {
+  const steps = [0.05, PITCH0, 0.45, 0.8];
+  let i = steps.findIndex(v => Math.abs(v - tgt.pitch) < 0.08);
+  tgt.pitch = steps[(i + 1) % steps.length]; markDirty();
+};
 
 /* ================================================================
    MODULE: SEARCH
 ================================================================ */
 let searchTimeout = null;
+const personMatches = (p, qn, qraw) =>
+  p.name.toLowerCase().includes(qn) || normName(TE_NAMES[p.name]).includes(normName(qraw));
 
 function initSearch(){
   const input = document.getElementById('search-input');
   const clearBtn = document.getElementById('search-clear');
-  const sugBox   = document.getElementById('search-suggestions');
+  const sugBox = document.getElementById('search-suggestions');
 
   input.addEventListener('input', () => {
     clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => handleSearch(input.value), 220);
+    searchTimeout = setTimeout(() => handleSearch(input.value), 200);
   });
-
   input.addEventListener('keydown', e => {
     if(e.key === 'Escape') clearSearch();
-  });
-
-  clearBtn.addEventListener('click', clearSearch);
-
-  // Close suggestions on outside click
-  document.addEventListener('click', e => {
-    if(!document.getElementById('search-box-wrap').contains(e.target)){
-      sugBox.style.display = 'none';
+    if(e.key === 'Enter'){
+      const q = input.value.trim(); if(!q) return;
+      const m = Object.values(G).filter(p => personMatches(p, q.toLowerCase(), q));
+      if(m.length){ sugBox.style.display = 'none'; selectPerson(m[0].id, true); }
     }
+  });
+  clearBtn.addEventListener('click', clearSearch);
+  document.addEventListener('click', e => {
+    if(!document.getElementById('search-box-wrap').contains(e.target)) sugBox.style.display = 'none';
   });
 }
 
 function handleSearch(query){
   const sug = document.getElementById('search-suggestions');
-  const q = query.trim().toLowerCase();
-
+  const q = query.trim();
   if(!q){ clearSearch(); return; }
+  const matches = Object.values(G).filter(p => personMatches(p, q.toLowerCase(), q));
 
-  // Find all matches
-  const matches = Object.values(G).filter(p => p.name.toLowerCase().includes(q));
+  if(matches.length === 0){ sug.style.display = 'none'; return; }
+  if(matches.length === 1){ sug.style.display = 'none'; selectPerson(matches[0].id, true); return; }
 
-  if(matches.length === 0){
-    searchHitId = null; sug.style.display = 'none'; renderTree(); return;
-  }
-
-  if(matches.length === 1){
-    // Exact single match — highlight immediately
-    sug.style.display = 'none';
-    applySearchHit(matches[0].id);
-  } else {
-    // Show suggestions
-    sug.innerHTML = matches.slice(0, 12).map(p => {
-      const father = p.fatherId ? G[p.fatherId]?.name : (p.motherId ? G[p.motherId]?.name : '');
-      const meta   = father ? `S/o · D/o ${father}` : (p.spouseId ? `Spouse: ${G[p.spouseId]?.name}` : '');
-      return `<div class="search-sug-item" onclick="selectSuggestion('${p.id}')">
-        <span class="sug-name">${p.name}</span>
-        ${meta ? `<span class="sug-meta">${meta}</span>` : ''}
-      </div>`;
-    }).join('');
-    sug.style.display = 'block';
-    // Still highlight first match faintly
-    searchHitId = null; renderTree();
-  }
+  sug.innerHTML = matches.slice(0, 12).map(p => {
+    const par = p.fatherId && BLOOD.has(p.fatherId) ? p.fatherId : (p.motherId ? p.motherId : (p.fatherId || null));
+    const meta = par ? `${t('childOf')} ${nm(par)}` : (p.spouseId ? `${t('Spouse')}: ${nm(p.spouseId)}` : '');
+    return `<div class="search-sug-item" onclick="selectSuggestion('${p.id}')">
+      <span class="sug-name">${nm(p.id)}</span>${meta ? `<span class="sug-meta">${meta}</span>` : ''}</div>`;
+  }).join('');
+  sug.style.display = 'block';
 }
 
 function selectSuggestion(id){
   document.getElementById('search-suggestions').style.display = 'none';
-  document.getElementById('search-input').value = G[id]?.name || '';
-  applySearchHit(id);
-}
-
-function applySearchHit(id){
-  searchHitId = id;
-  // Auto-expand ancestors so node is visible
-  expandAncestors(id);
-  renderTree();
-  // Scroll to the node after render
-  setTimeout(() => scrollToNode(id), 60);
-}
-
-/** Expand all ancestors of a node to make it visible */
-function expandAncestors(id){
-  let cur = id;
-  while(cur){
-    const p = G[cur];
-    if(!p) break;
-    // Find parent who has this as a child
-    const parentId = Object.keys(G).find(pid =>
-      G[pid].childrenIds && G[pid].childrenIds.includes(cur)
-    );
-    if(parentId){
-      collapsed[parentId] = false;
-      cur = parentId;
-    } else break;
-  }
-}
-
-/** Pan viewport to center a node by its data-id */
-function scrollToNode(id){
-  const el = document.querySelector(`[data-id="${id}"]`);
-  const vp = document.getElementById('tree-viewport');
-  if(!el || !vp) return;
-  const rect  = el.getBoundingClientRect();
-  const vpRect = vp.getBoundingClientRect();
-  const targetX = rect.left + rect.width/2  - vpRect.left  - vpRect.width/2;
-  const targetY = rect.top  + rect.height/2 - vpRect.top   - vpRect.height/2;
-  tx -= targetX; ty -= targetY;
-  applyT(true);
+  document.getElementById('search-input').value = nm(id);
+  selectPerson(id, true);
 }
 
 function clearSearch(){
-  searchHitId = null;
   document.getElementById('search-input').value = '';
   document.getElementById('search-suggestions').style.display = 'none';
-  renderTree();
+  if(searchHitId) clearSelection();
 }
 
 /* ================================================================
-   MODULE: TOOLBAR & BARS
+   MODULE: TOOLBAR + ACTIONS
 ================================================================ */
 function renderToolbar(){
   const tb = document.getElementById('toolbar'); if(!tb) return;
@@ -1319,64 +1637,45 @@ function renderToolbar(){
     <button class="btn btn-primary" onclick="openModal()">${t('btnRelation')}</button>
     <button class="btn" onclick="expandAll()">${t('btnExpand')}</button>
     <button class="btn" onclick="collapseAll()">${t('btnCollapse')}</button>
-    ${youId ? `<button class="btn btn-danger" onclick="clearYou()">${t('btnClear')}</button>` : ''}`;
+    ${(youId || bloodId) ? `<button class="btn btn-danger" onclick="clearYou()">${t('btnClear')}</button>` : ''}`;
 }
 
-function renderYouBar(){
-  const bar = document.getElementById('you-bar'); if(!bar) return;
-  if(youId){
-    bar.style.display = 'block';
-    bar.innerHTML = `${t('youBarPre')} <b>${G[youId].name}</b> &nbsp;·&nbsp; ${t('youBarSuf')}`;
-  } else { bar.style.display = 'none'; }
-}
-
-/* ================================================================
-   MODULE: ACTIONS
-================================================================ */
-function nodeClick(id){
-  // Click on a node during search → jump to relationship modal
-}
-
-function togNode(e, id){
-  e.stopPropagation();
+function togNode(id){
   collapsed[id] = !collapsed[id];
-  renderTree();
+  relayout(); updateCards();
 }
-
-function expandAll(){ collapsed = {}; renderTree(); }
-
+function expandAll(){ collapsed = {}; relayout(); updateCards(); fitView(); }
 function collapseAll(){
-  Object.keys(G).forEach(id => {
-    if(G[id].childrenIds && G[id].childrenIds.length) collapsed[id] = true;
-  });
-  renderTree();
+  Object.values(U).forEach(u => { if(u.kids.length) collapsed[u.id] = true; });
+  relayout(); updateCards(); fitView();
 }
-
 function clearYou(){
-  youId = null; relMap = {}; pathSet = new Set(); dimMode = false;
-  renderToolbar(); renderYouBar(); renderTree();
+  youId = null; relMap = {}; pathSet = new Set(); dimMode = false; bloodId = null; searchHitId = null;
+  document.getElementById('search-input').value = '';
+  renderToolbar(); updateBars(); updateCards(); fitView();
 }
-
 function setYou(id){
-  youId   = id;
-  relMap  = buildRelMap(id);
-  pathSet = new Set(); dimMode = false; // reset, will be set per targetId below
-  renderToolbar(); renderYouBar(); renderTree();
+  youId = id; relMap = buildRelMap(id); searchHitId = null;
+  computeBloodline(id); expandFor(id);
+  renderToolbar(); updateBars(); relayout(); updateCards();
+  focusUnit(unitOf[id]);
 }
 
 /* ================================================================
    MODULE: MODAL — Know Your Relationship
 ================================================================ */
 function openModal(){
-  const fList = Object.values(G)
-    .filter(p => p.childrenIds && p.childrenIds.length)
-    .sort((a,b) => a.name.localeCompare(b.name));
-  const fOpts = fList.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
-  const teF = lang==='te' ? 'font-family:"Noto Serif Telugu",serif;' : '';
+  const fList = Object.values(G).filter(p => p.childrenIds && p.childrenIds.length)
+    .sort((a,b) => nm(a.id).localeCompare(nm(b.id), lang==='te'?'te':'en'));
+  const fOpts = fList.map(f => {
+    const par = f.fatherId || f.motherId || f.spouseId;
+    const hint = par ? ` (${nm(par)})` : '';
+    return `<option value="${f.id}">${nm(f.id)}${hint}</option>`;
+  }).join('');
 
   document.getElementById('modal-root').innerHTML = `
     <div class="modal-overlay" id="moverlay" onclick="mClick(event)">
-      <div class="modal" style="${teF}">
+      <div class="modal">
         <h2>${t('modalTitle')}</h2>
         <p>${t('modalDesc')}</p>
         <div class="fgrp">
@@ -1384,7 +1683,7 @@ function openModal(){
           <input id="inp-name" placeholder="${t('placeholderName')}" onkeydown="if(event.key==='Enter')doFind()"/>
         </div>
         <div class="fgrp">
-          <label>${t('labelFather')} <span style="font-size:.55rem;opacity:.5">${t('labelFatherHint')}</span></label>
+          <label>${t('labelFather')} <span style="font-size:.6rem;opacity:.55">${t('labelFatherHint')}</span></label>
           <select id="inp-father">
             <option value="">${t('fatherDefault')}</option>
             ${fOpts}
@@ -1400,130 +1699,24 @@ function openModal(){
     </div>`;
   setTimeout(() => { const el = document.getElementById('inp-name'); if(el) el.focus(); }, 50);
 }
-
 function mClick(e){ if(e.target.id === 'moverlay') closeModal(); }
 function closeModal(){ document.getElementById('modal-root').innerHTML = ''; }
 
 function doFind(){
-  const name  = (document.getElementById('inp-name').value || '').trim().toLowerCase();
+  const raw   = document.getElementById('inp-name').value || '';
+  const name  = normName(raw);
   const fid   = document.getElementById('inp-father').value;
   const errEl = document.getElementById('modal-err');
-
   if(!name){ errEl.textContent = t('errNoName'); return; }
 
-  let matches = Object.values(G).filter(p => p.name.toLowerCase() === name);
+  let matches = Object.values(G).filter(p => normName(p.name) === name || normName(TE_NAMES[p.name]) === name);
   if(fid) matches = matches.filter(p => p.fatherId === fid || p.motherId === fid);
-
   if(matches.length === 0){ errEl.textContent = t('errNotFound'); return; }
-  if(matches.length > 1)  { errEl.textContent = t('errMultiple'); return; }
+  if(matches.length > 1){ errEl.textContent = t('errMultiple'); return; }
 
   closeModal();
-  const foundId = matches[0].id;
-  setYou(foundId);
-
-  // After setting "you", compute lineage path to all blood relatives and dim others
-  activateLineageMode(foundId);
+  setYou(matches[0].id);
 }
-
-/** Highlight the lineage path and dim non-related nodes */
-function activateLineageMode(youId){
-  // Build union of all paths from youId to each known relative
-  const allPathIds = new Set([youId]);
-  // Add ancestors
-  ancestorMap(youId).forEach((d, id) => allPathIds.add(id));
-  // Add descendants
-  function addDesc(id){
-    const p = G[id]; if(!p) return;
-    if(p.childrenIds) p.childrenIds.forEach(cid => { allPathIds.add(cid); addDesc(cid); });
-  }
-  addDesc(youId);
-  // Add spouses of path members
-  const extras = [];
-  allPathIds.forEach(id => { if(G[id]?.spouseId) extras.push(G[id].spouseId); });
-  extras.forEach(id => allPathIds.add(id));
-
-  pathSet = allPathIds;
-  dimMode = true;
-  renderTree();
-
-  // Auto-expand to show you node
-  expandAncestors(youId);
-  renderTree();
-  setTimeout(() => scrollToNode(youId), 80);
-}
-
-/* ================================================================
-   MODULE: ZOOM & PAN
-================================================================ */
-let scale = 0.85, tx = 0, ty = 20;
-let isPanning = false, lastX = 0, lastY = 0;
-
-function applyT(anim){
-  const c = document.getElementById('tree-canvas'); if(!c) return;
-  c.style.transition = anim ? 'transform 0.3s ease' : 'none';
-  c.style.transform  = `translate(${tx}px,${ty}px) scale(${scale})`;
-  const lbl = document.getElementById('zoom-label');
-  if(lbl) lbl.textContent = Math.round(scale * 100) + '%';
-}
-
-function centerTree(){
-  const vp = document.getElementById('tree-viewport');
-  const c  = document.getElementById('tree-canvas');
-  if(!vp || !c) return;
-  tx = Math.max((vp.clientWidth - c.scrollWidth * scale) / 2, 20);
-  ty = 20;
-  applyT(true);
-}
-
-document.getElementById('zoom-in').onclick    = () => { scale = Math.min(scale * 1.2, 3); applyT(true); };
-document.getElementById('zoom-out').onclick   = () => { scale = Math.max(scale / 1.2, 0.15); applyT(true); };
-document.getElementById('zoom-reset').onclick = () => { scale = 0.85; centerTree(); };
-
-const vpEl = document.getElementById('tree-viewport');
-
-// Mouse wheel zoom
-vpEl.addEventListener('wheel', e => {
-  e.preventDefault();
-  const d = e.deltaY > 0 ? 0.9 : 1.1;
-  const r = vpEl.getBoundingClientRect();
-  const mx = e.clientX - r.left, my = e.clientY - r.top;
-  const ns = Math.min(Math.max(scale * d, 0.15), 3);
-  tx = mx - (mx - tx) * (ns / scale);
-  ty = my - (my - ty) * (ns / scale);
-  scale = ns; applyT(false);
-}, { passive: false });
-
-// Mouse drag
-vpEl.addEventListener('mousedown', e => {
-  if(e.button !== 0) return;
-  isPanning = true; lastX = e.clientX; lastY = e.clientY;
-  vpEl.classList.add('panning');
-});
-window.addEventListener('mousemove', e => {
-  if(!isPanning) return;
-  tx += e.clientX - lastX; ty += e.clientY - lastY;
-  lastX = e.clientX; lastY = e.clientY; applyT(false);
-});
-window.addEventListener('mouseup', () => { isPanning = false; vpEl.classList.remove('panning'); });
-
-// Touch pan & pinch-zoom
-let ltx = 0, lty = 0, ld = 0;
-vpEl.addEventListener('touchstart', e => {
-  if(e.touches.length === 1){ ltx = e.touches[0].clientX; lty = e.touches[0].clientY; }
-  else if(e.touches.length === 2)
-    ld = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-}, { passive: true });
-vpEl.addEventListener('touchmove', e => {
-  e.preventDefault();
-  if(e.touches.length === 1){
-    tx += e.touches[0].clientX - ltx; ty += e.touches[0].clientY - lty;
-    ltx = e.touches[0].clientX; lty = e.touches[0].clientY; applyT(false);
-  } else if(e.touches.length === 2){
-    const nd = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-    if(ld){ scale = Math.min(Math.max(scale * (nd / ld), 0.15), 3); applyT(false); }
-    ld = nd;
-  }
-}, { passive: false });
 
 /* ================================================================
    MODULE: TIMELINE
@@ -1539,15 +1732,20 @@ function buildTimeline(){
 }
 
 /* ================================================================
-   BOOT — initialise everything
+   BOOT
 ================================================================ */
+buildCards();
 applyUIStrings();
 initSearch();
 renderToolbar();
-renderYouBar();
-renderTree();
+updateBars();
+resize();
+relayout();
+updateCards();
 buildTimeline();
-setTimeout(centerTree, 120);
+fitView();
+cam.cy = tgt.cy;
+requestAnimationFrame(frame);
 </script>
 </body>
-</html> 		
+</html>
